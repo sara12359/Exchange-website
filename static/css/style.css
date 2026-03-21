@@ -70,6 +70,7 @@ h1 {
     text-align: center;
     background: linear-gradient(to right, #818cf8, #34d399);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 

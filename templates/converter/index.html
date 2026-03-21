@@ -30,7 +30,7 @@
                     <label for="from_currency">From</label>
                     <select name="from_currency" id="from_currency" required>
                         {% for code, name in currencies %}
-                            <option value="{{ code }}" {% if result.from_currency == code or (not result and code == 'USD') %}selected{% endif %}>
+                            <option value="{{ code }}" {% if result.from_currency == code or not result and code == 'USD' %}selected{% endif %}>
                                 {{ code }} - {{ name }}
                             </option>
                         {% endfor %}
@@ -41,7 +41,7 @@
                     <label for="to_currency">To</label>
                     <select name="to_currency" id="to_currency" required>
                         {% for code, name in currencies %}
-                            <option value="{{ code }}" {% if result.to_currency == code or (not result and code == 'EUR') %}selected{% endif %}>
+                            <option value="{{ code }}" {% if result.to_currency == code or not result and code == 'EUR' %}selected{% endif %}>
                                 {{ code }} - {{ name }}
                             </option>
                         {% endfor %}
