@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency Convertr | Real-time Exchange Rates</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-blur bg-blur-1"></div>
+    <div class="bg-blur bg-blur-2"></div>
+
+    <div class="container">
+        <div class="card">
+            <h1>Currency Converter</h1>
+            <p class="subtitle">Fast, secure & real-time exchange rates</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+                    <input type="number" step="any" name="amount" id="amount" placeholder="Enter amount" value="{{ result.amount|default:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="from_currency">From</label>
+                    <select name="from_currency" id="from_currency" required>
+                        {% for code, name in currencies %}
+                            <option value="{{ code }}" {% if result.from_currency == code or (not result and code == 'USD') %}selected{% endif %}>
+                                {{ code }} - {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="to_currency">To</label>
+                    <select name="to_currency" id="to_currency" required>
+                        {% for code, name in currencies %}
+                            <option value="{{ code }}" {% if result.to_currency == code or (not result and code == 'EUR') %}selected{% endif %}>
+                                {{ code }} - {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button type="submit" class="convert-btn">Convert Now</button>
+            </form>
+
+            {% if result %}
+                <div class="result-container">
+                    <div class="result-text">
+                        {{ result.amount }} {{ result.from_currency }} = {{ result.converted_amount|floatformat:2 }} {{ result.to_currency }}
+                    </div>
+                    <div class="rate-text">
+                        Rate: 1 {{ result.from_currency }} = {{ result.rate }} {{ result.to_currency }}
+                        <br>
+                        <small>Last updated: {{ result.last_update }}</small>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="error-message">
+                    {{ error }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Currency Converter. Powered by ExchangeRate-API.
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
