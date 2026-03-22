@@ -53,13 +53,33 @@
 
             {% if result %}
                 <div class="result-container">
-                    <div class="result-text">
-                        {{ result.amount }} {{ result.from_currency }} = {{ result.converted_amount|floatformat:2 }} {{ result.to_currency }}
+                    <div class="result-header">
+                        <span class="result-label">Converted Amount</span>
                     </div>
-                    <div class="rate-text">
-                        Rate: 1 {{ result.from_currency }} = {{ result.rate }} {{ result.to_currency }}
-                        <br>
-                        <small>Last updated: {{ result.last_update }}</small>
+                    <div class="result-text">
+                        {{ result.amount }} {{ result.from_currency }} = 
+                        <span class="converted-value">{{ result.converted_amount|floatformat:2 }} {{ result.to_currency }}</span>
+                    </div>
+                    <div class="rate-badge">
+                        Rate: 1 {{ result.from_currency }} = {{ result.rate|floatformat:4 }} {{ result.to_currency }}
+                    </div>
+                    <div class="update-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Last updated: {{ result.last_update|date:"M d, Y H:i" }} UTC
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if common_conversions %}
+                <div class="common-conversions">
+                    <h3>Popular Conversions (1 {{ base_for_common }})</h3>
+                    <div class="conversions-grid">
+                        {% for conv in common_conversions %}
+                            <div class="conv-item">
+                                <span class="conv-code">{{ conv.symbol }}</span>
+                                <span class="conv-rate">{{ conv.rate|floatformat:4 }}</span>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endif %}
