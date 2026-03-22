@@ -160,6 +160,7 @@ select {
     border: 1px solid rgba(16, 185, 129, 0.2);
     border-radius: 16px;
     animation: slideUp 0.5s ease-out;
+    text-align: center;
 }
 
 @keyframes slideUp {
@@ -167,18 +168,105 @@ select {
     to { opacity: 1; transform: translateY(0); }
 }
 
+.result-header {
+    margin-bottom: 0.5rem;
+}
+
+.result-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
 .result-text {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.converted-value {
     color: var(--accent-color);
+    font-size: 1.75rem;
+    font-weight: 800;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.rate-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-color);
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.update-info {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.update-info svg {
+    opacity: 0.7;
+}
+
+.common-conversions {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--card-border);
+}
+
+.common-conversions h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+    font-weight: 600;
     text-align: center;
 }
 
-.rate-text {
+.conversions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.conv-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.conv-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.conv-code {
+    font-weight: 700;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+}
+
+.conv-rate {
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.875rem;
-    color: var(--text-secondary);
-    text-align: center;
-    margin-top: 0.5rem;
+    color: var(--accent-color);
+    font-weight: 500;
 }
 
 .error-message {
