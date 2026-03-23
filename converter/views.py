@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.utils import timezone
+from datetime import timedelta
 from .services import ExchangeRateService
 from .models import ExchangeRate
 
@@ -30,6 +31,25 @@ def index(request):
                         'last_update': data['time_last_update_utc']
                     }
                     base_for_common = from_curr
+
+                    # Fetch historical rates
+                    today = timezone.now().date()
+                    yesterday = today - timedelta(days=1)
+                    last_week = today - timedelta(days=7)
+
+                    rate_yesterday = ExchangeRateService.get_historical_rate(yesterday, from_curr, to_curr)
+                    rate_last_week = ExchangeRateService.get_historical_rate(last_week, from_curr, to_curr)
+
+                    historical_data = {
+                        'yesterday': rate_yesterday,
+                        'last_week': rate_last_week,
+                    }
+
+                    if rate_last_week and data['conversion_rate']:
+                        change = ((float(data['conversion_rate']) - float(rate_last_week)) / float(rate_last_week)) * 100
+                        historical_data['7d_change'] = change
+                    
+                    result['historical'] = historical_data
                 else:
                     error = "Unable to fetch conversion rate. Please try again later."
             except ValueError:

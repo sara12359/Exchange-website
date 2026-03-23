@@ -67,6 +67,43 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                         Last updated: {{ result.last_update|date:"M d, Y H:i" }} UTC
                     </div>
+
+                    {% if result.historical %}
+                        <div class="historical-section">
+                            <h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                Historical Performance
+                            </h3>
+                            <div class="historical-grid">
+                                <div class="hist-item">
+                                    <span class="hist-label">Today</span>
+                                    <span class="hist-value">{{ result.rate|floatformat:4 }}</span>
+                                </div>
+                                <div class="hist-item">
+                                    <span class="hist-label">Yesterday</span>
+                                    <span class="hist-value">{{ result.historical.yesterday|default:"N/A"|floatformat:4 }}</span>
+                                </div>
+                                <div class="hist-item">
+                                    <span class="hist-label">Last Week</span>
+                                    <span class="hist-value">{{ result.historical.last_week|default:"N/A"|floatformat:4 }}</span>
+                                </div>
+                            </div>
+                            
+                            {% if result.historical.7d_change %}
+                                <div class="trend-info {% if result.historical.7d_change > 0 %}trend-up{% else %}trend-down{% endif %}">
+                                    {% if result.historical.7d_change > 0 %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                                        <span>7-day change:</span>
+                                        <span class="change-badge up">+{{ result.historical.7d_change|abs|floatformat:2 }}%</span>
+                                    {% else %}
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                                        <span>7-day change:</span>
+                                        <span class="change-badge down">-{{ result.historical.7d_change|abs|floatformat:2 }}%</span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
 
