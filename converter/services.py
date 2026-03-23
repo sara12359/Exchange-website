@@ -1,7 +1,7 @@
 import requests
 from django.conf import settings
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timedelta
 from .models import Currency, ExchangeRate
 
 class ExchangeRateService:
@@ -100,3 +100,22 @@ class ExchangeRateService:
                 return None
             except requests.RequestException:
                 return None
+
+    @staticmethod
+    def get_historical_rate(date_obj, base_currency, target_currency):
+        """Fetch historical rate for a specific date using Fawaz Ahmed's API."""
+        date_str = date_obj.strftime('%Y-%m-%d')
+        # Handle cases where the data might not be available yet for today or very recent
+        # The API path uses the date in the subdomain/path usually
+        # But this specific CDN version uses @date in the version part
+        url = f"https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{date_str}/v1/currencies/{base_currency.lower()}.json"
+        
+        try:
+            response = requests.get(url, timeout=5)
+            response.raise_for_status()
+            data = response.json()
+            rate = data.get(base_currency.lower(), {}).get(target_currency.lower())
+            return rate
+        except requests.RequestException:
+            # Fallback if specific date is not found or error
+            return None
