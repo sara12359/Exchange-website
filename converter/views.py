@@ -48,6 +48,7 @@ def index(request):
                     if rate_last_week and data['conversion_rate']:
                         change = ((float(data['conversion_rate']) - float(rate_last_week)) / float(rate_last_week)) * 100
                         historical_data['7d_change'] = change
+                        historical_data['7d_change_abs'] = abs(change)
                     
                     result['historical'] = historical_data
                 else:
