@@ -1,16 +1,48 @@
 document.addEventListener('DOMContentLoaded', () => {
-        color: var(--text-secondary);
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        margin: 0.5rem auto;
-        transition: all 0.3s ease;
-        font-size: 1.2rem;
+    // Theme Switcher Logic
+    const themeToggle = document.getElementById('theme-toggle');
+    const sunIcon = document.getElementById('sun-icon');
+    const moonIcon = document.getElementById('moon-icon');
+    const htmlElement = document.documentElement;
+
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+
+    function setTheme(theme) {
+        htmlElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+        if (theme === 'light') {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        } else {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        }
+    }
+
+    // Currency Swap Logic
+    const fromSelect = document.getElementById('from_currency');
+    const toSelect = document.getElementById('to_currency');
+    const form = document.querySelector('form');
+    
+    // Create a better swap button with modern styles
+    const swapBtn = document.createElement('button');
+    swapBtn.type = 'button';
+    swapBtn.className = 'swap-btn';
+    swapBtn.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="3" y1="21" x2="20" y2="4"></line></svg>
     `;
+    
+    // Position it between the two selects
+    const toGroup = toSelect.closest('.form-group');
+    toGroup.before(swapBtn);
 
     swapBtn.addEventListener('click', () => {
         const temp = fromSelect.value;
@@ -18,33 +50,29 @@ document.addEventListener('DOMContentLoaded', () => {
         toSelect.value = temp;
         
         // Add rotation animation
-        swapBtn.style.transform = 'rotate(180deg)';
+        swapBtn.classList.add('rotating');
         setTimeout(() => {
-            swapBtn.style.transform = 'rotate(0deg)';
-        }, 300);
+            swapBtn.classList.remove('rotating');
+        }, 400);
     });
 
-    swapBtn.addEventListener('mouseenter', () => {
-        swapBtn.style.background = 'rgba(255, 255, 255, 0.1)';
-        swapBtn.style.color = 'var(--text-primary)';
-    });
+    // Form submission state
+    const convertBtn = document.querySelector('.convert-btn');
+    if (form && convertBtn) {
+        form.addEventListener('submit', () => {
+            convertBtn.innerHTML = '<span class="loading">Processing...</span>';
+            convertBtn.style.opacity = '0.7';
+            convertBtn.style.pointerEvents = 'none';
+        });
+    }
 
-    swapBtn.addEventListener('mouseleave', () => {
-        swapBtn.style.background = 'rgba(255, 255, 255, 0.05)';
-        swapBtn.style.color = 'var(--text-secondary)';
-    });
-
-    // Insert swap button between From and To selects
-    const fromGroup = fromSelect.closest('.form-group');
-    fromGroup.after(swapBtn);
-
-    // Form submission animation
-    const form = document.querySelector('form');
-    const btn = document.querySelector('.convert-btn');
-
-    form.addEventListener('submit', () => {
-        btn.innerHTML = '<span class="loading">Converting...</span>';
-        btn.style.opacity = '0.7';
-        btn.style.pointerEvents = 'none';
-    });
+    // Interactive button effects
+    if (convertBtn) {
+        convertBtn.addEventListener('mousedown', () => {
+            convertBtn.style.transform = 'scale(0.98)';
+        });
+        convertBtn.addEventListener('mouseup', () => {
+            convertBtn.style.transform = 'translateY(-2px)';
+        });
+    }
 });
