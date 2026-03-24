@@ -1,15 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const fromSelect = document.getElementById('from_currency');
-    const toSelect = document.getElementById('to_currency');
-    const swapBtn = document.createElement('button');
-    
-    // Add swap button functionality
-    swapBtn.type = 'button';
-    swapBtn.className = 'swap-btn';
-    swapBtn.innerHTML = '⇄';
-    swapBtn.style.cssText = `
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
         color: var(--text-secondary);
         width: 40px;
         height: 40px;
