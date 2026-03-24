@@ -213,6 +213,37 @@ select {
     transform: translateY(0);
 }
 
+.swap-btn {
+    background: var(--item-bg);
+    border: 1px solid var(--card-border);
+    color: var(--primary);
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin: 1rem auto;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.swap-btn:hover {
+    background: var(--card-bg);
+    border-color: var(--primary);
+    transform: rotate(180deg) scale(1.1);
+    box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.2);
+}
+
+.swap-btn svg {
+    transition: transform 0.4s ease;
+}
+
+.swap-btn.rotating svg {
+    transform: rotate(360deg);
+}
+
 .result-container {
     margin-top: 2.5rem;
     padding: 2rem;
