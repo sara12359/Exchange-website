@@ -97,8 +97,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const ctx = document.getElementById('trendChart').getContext('2d');
-            const labels = {{ labels_json|safe }};
-            const dataValues = {{ historical_rates_json|safe }};
+            const labels = JSON.parse('{{ labels_json|escapejs }}');
+            const dataValues = JSON.parse('{{ historical_rates_json|escapejs }}');
             
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const primaryColor = '#6366f1';
