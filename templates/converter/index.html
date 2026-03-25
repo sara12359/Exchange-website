@@ -20,6 +20,10 @@
     <div class="bg-blur bg-blur-2"></div>
 
     <div class="container">
+        <div class="nav-links" style="display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 2rem;">
+            <a href="{% url 'index' %}" class="nav-link active" style="color: var(--primary); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Converter</a>
+            <a href="{% url 'currency_trend' %}" class="nav-link" style="color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.9rem;">Trends</a>
+        </div>
         <div class="card">
             <h1>Currency Converter</h1>
             <p class="subtitle">Fast, secure & real-time exchange rates</p>
