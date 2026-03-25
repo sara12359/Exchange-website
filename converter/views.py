@@ -84,7 +84,6 @@ def index(request):
     return render(request, 'converter/index.html', context)
 
 def currency_trend(request):
-    import json
     currencies = ExchangeRateService.get_supported_currencies()
     from_curr = request.GET.get('from', 'USD')
     to_curr = request.GET.get('to', 'EUR')
