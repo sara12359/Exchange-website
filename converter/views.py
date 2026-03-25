@@ -81,3 +81,31 @@ def index(request):
         'error': error,
     }
     return render(request, 'converter/index.html', context)
+
+def currency_trend(request):
+    import json
+    currencies = ExchangeRateService.get_supported_currencies()
+    from_curr = request.GET.get('from', 'USD')
+    to_curr = request.GET.get('to', 'EUR')
+    days_str = request.GET.get('days', '30')
+    
+    try:
+        days = int(days_str)
+    except ValueError:
+        days = 30
+    
+    historical_rates = ExchangeRateService.get_historical_rates_range(from_curr, to_curr, days)
+    
+    # Prepare data for Chart.js
+    labels = [rate['date'] for rate in historical_rates]
+    values = [float(rate['rate']) for rate in historical_rates]
+    
+    context = {
+        'currencies': currencies,
+        'from_curr': from_curr,
+        'to_curr': to_curr,
+        'days': days,
+        'historical_rates_json': json.dumps(values),
+        'labels_json': json.dumps(labels),
+    }
+    return render(request, 'converter/trend.html', context)
