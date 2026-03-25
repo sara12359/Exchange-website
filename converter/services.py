@@ -119,3 +119,18 @@ class ExchangeRateService:
         except requests.RequestException:
             # Fallback if specific date is not found or error
             return None
+
+    @staticmethod
+    def get_historical_rates_range(base_currency, target_currency, days=7):
+        """Fetch historical rates for a range of days."""
+        rates = []
+        today = timezone.now().date()
+        for i in range(days):
+            date_obj = today - timedelta(days=i)
+            rate = ExchangeRateService.get_historical_rate(date_obj, base_currency, target_currency)
+            if rate:
+                rates.append({
+                    'date': date_obj.strftime('%Y-%m-%d'),
+                    'rate': rate
+                })
+        return rates[::-1] # Return in chronological order
