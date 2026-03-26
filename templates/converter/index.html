@@ -28,33 +28,67 @@
             <h1>Currency Converter</h1>
             <p class="subtitle">Fast, secure & real-time exchange rates</p>
 
-            <form method="POST">
+            <form method="POST" id="converter-form">
                 {% csrf_token %}
                 <div class="form-group">
                     <label for="amount">Amount</label>
-                    <input type="number" step="any" name="amount" id="amount" placeholder="Enter amount" value="{{ result.amount|default:'' }}" required>
+                    <input type="number" step="any" name="amount" id="amount" placeholder="0.00" value="{{ result.amount|default:'' }}" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="from_currency">From</label>
-                    <select name="from_currency" id="from_currency" required>
-                        {% for code, name in currencies %}
-                            <option value="{{ code }}" {% if result.from_currency == code or not result and code == 'USD' %}selected{% endif %}>
-                                {{ code }} - {{ name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <label>From</label>
+                    <div class="custom-select-wrapper">
+                        <select name="from_currency" id="from_currency" hidden required>
+                            {% for code, name, country in currencies %}
+                                <option value="{{ code }}" {% if result.from_currency == code or not result and code == 'USD' %}selected{% endif %} data-country="{{ country }}">
+                                    {{ code }} - {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="custom-select" id="from-custom-select">
+                            <img src="https://flagcdn.com/w40/us.png" class="flag-icon" alt="flag">
+                            <span class="currency-code">USD</span>
+                        </div>
+                        <div class="select-options" id="from-options">
+                            {% for code, name, country in currencies %}
+                                <div class="select-option {% if result.from_currency == code or not result and code == 'USD' %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
+                                    <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
+                                    <div class="currency-info">
+                                        <span class="currency-code">{{ code }}</span>
+                                        <span class="currency-name">{{ name }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="to_currency">To</label>
-                    <select name="to_currency" id="to_currency" required>
-                        {% for code, name in currencies %}
-                            <option value="{{ code }}" {% if result.to_currency == code or not result and code == 'EUR' %}selected{% endif %}>
-                                {{ code }} - {{ name }}
-                            </option>
-                        {% endfor %}
-                    </select>
+                    <label>To</label>
+                    <div class="custom-select-wrapper">
+                        <select name="to_currency" id="to_currency" hidden required>
+                            {% for code, name, country in currencies %}
+                                <option value="{{ code }}" {% if result.to_currency == code or not result and code == 'EUR' %}selected{% endif %} data-country="{{ country }}">
+                                    {{ code }} - {{ name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="custom-select" id="to-custom-select">
+                            <img src="https://flagcdn.com/w40/eu.png" class="flag-icon" alt="flag">
+                            <span class="currency-code">EUR</span>
+                        </div>
+                        <div class="select-options" id="to-options">
+                            {% for code, name, country in currencies %}
+                                <div class="select-option {% if result.to_currency == code or not result and code == 'EUR' %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
+                                    <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
+                                    <div class="currency-info">
+                                        <span class="currency-code">{{ code }}</span>
+                                        <span class="currency-name">{{ name }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" class="convert-btn">Convert Now</button>
