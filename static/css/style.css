@@ -589,7 +589,10 @@ select {
     color: var(--danger);
     font-size: 0.95rem;
     font-weight: 600;
-    text-align: center;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     animation: shake 0.5s ease-in-out;
 }
 
