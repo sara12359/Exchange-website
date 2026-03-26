@@ -116,32 +116,33 @@ document.addEventListener('DOMContentLoaded', () => {
         fromSelect.value = toSelect.value;
         toSelect.value = temp;
         
-        // Sync custom displays
-        const fromWrapper = document.getElementById('from-custom-select');
-        const toWrapper = document.getElementById('to-custom-select');
+        // Sync custom displays by triggering updateDisplay logic
+        // We can just call the init logic again or store the functions
+        // But since we want to be clean, let's just trigger a change event if we had listeners
+        // Or just manually call the update logic. Let's make the update logic accessible.
         
-        // Trigger manual update of custom displays
-        const updateCustomDisplay = (selectEl, customElId) => {
-            const selectedOption = selectEl.options[selectEl.selectedIndex];
-            const country = selectedOption.getAttribute('data-country');
-            const code = selectedOption.value;
-            const customEl = document.getElementById(customElId);
-            customEl.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
-            customEl.querySelector('.currency-code').textContent = code;
+        const updateAll = () => {
+            const selects = ['from_currency', 'to_currency'];
+            selects.forEach(id => {
+                const selectEl = document.getElementById(id);
+                const wrapper = selectEl.closest('.custom-select-wrapper');
+                const customSelect = wrapper.querySelector('.custom-select');
+                const options = wrapper.querySelectorAll('.select-option');
+                const selectedOption = selectEl.options[selectEl.selectedIndex];
+                
+                if (selectedOption) {
+                    const country = selectedOption.getAttribute('data-country');
+                    const code = selectedOption.value;
+                    customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
+                    customSelect.querySelector('.currency-code').textContent = code;
+                    options.forEach(opt => {
+                        opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
+                    });
+                }
+            });
         };
 
-        updateCustomDisplay(fromSelect, 'from-custom-select');
-        updateCustomDisplay(toSelect, 'to-custom-select');
-
-        // Update target options active state
-        document.querySelectorAll('.select-option').forEach(opt => {
-            const val = opt.getAttribute('data-value');
-            if (opt.closest('#from-options')) {
-                opt.classList.toggle('selected', val === fromSelect.value);
-            } else if (opt.closest('#to-options')) {
-                opt.classList.toggle('selected', val === toSelect.value);
-            }
-        });
+        updateAll();
         
         // Add rotation animation
         swapBtn.classList.add('rotating');
