@@ -4,6 +4,17 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from .models import Currency, ExchangeRate
 
+CURRENCY_TO_COUNTRY = {
+    'USD': 'us', 'EUR': 'eu', 'GBP': 'gb', 'JPY': 'jp', 'CAD': 'ca', 'AUD': 'au',
+    'CHF': 'ch', 'CNY': 'cn', 'SEK': 'se', 'NZD': 'nz', 'INR': 'in', 'BRL': 'br',
+    'RUB': 'ru', 'KRW': 'kr', 'SGD': 'sg', 'ZAR': 'za', 'TRY': 'tr', 'MXN': 'mx',
+    'IDR': 'id', 'MYR': 'my', 'PHP': 'ph', 'THB': 'th', 'CZK': 'cz', 'PLN': 'pl',
+    'HUF': 'hu', 'RON': 'ro', 'DKK': 'dk', 'ILS': 'il', 'AED': 'ae', 'SAR': 'sa',
+    'RWF': 'rw', 'KES': 'ke', 'UGX': 'ug', 'TZS': 'tz', 'GHS': 'gh', 'NGN': 'ng',
+    'EGP': 'eg', 'MAD': 'ma', 'HKD': 'hk', 'TWD': 'tw', 'NOK': 'no', 'CLP': 'cl',
+    'COP': 'co', 'PEN': 'pe', 'ARS': 'ar', 'PKR': 'pk', 'VND': 'vn', 'UAH': 'ua',
+}
+
 class ExchangeRateService:
     BASE_URL = f"https://v6.exchangerate-api.com/v6/{settings.EXCHANGE_RATE_API_KEY}"
 
@@ -56,8 +67,8 @@ class ExchangeRateService:
         currencies = Currency.objects.all().order_by('code')
         if not currencies.exists():
             codes = ExchangeRateService.sync_currencies()
-            return codes
-        return [[c.code, c.name] for c in currencies]
+            return [[code, name, CURRENCY_TO_COUNTRY.get(code, code[:2].lower())] for code, name in codes]
+        return [[c.code, c.name, CURRENCY_TO_COUNTRY.get(c.code, c.code[:2].lower())] for c in currencies]
 
     @staticmethod
     def convert(from_currency, to_currency, amount):
