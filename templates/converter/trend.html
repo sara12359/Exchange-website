@@ -51,25 +51,59 @@
             <form method="GET">
                 <div class="trend-controls">
                     <div class="form-group">
-                        <label for="from_currency">From</label>
-                        <select name="from" id="from_currency" required>
-                            {% for code, name in currencies %}
-                                <option value="{{ code }}" {% if from_curr == code %}selected{% endif %}>
-                                    {{ code }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        <label>From</label>
+                        <div class="custom-select-wrapper">
+                            <select name="from" id="from_currency" hidden required>
+                                {% for code, name, country in currencies %}
+                                    <option value="{{ code }}" {% if from_curr == code %}selected{% endif %} data-country="{{ country }}">
+                                        {{ code }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="custom-select" id="from-custom-select">
+                                <img src="https://flagcdn.com/w40/us.png" class="flag-icon" alt="flag">
+                                <span class="currency-code">USD</span>
+                            </div>
+                            <div class="select-options" id="from-options">
+                                {% for code, name, country in currencies %}
+                                    <div class="select-option {% if from_curr == code %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
+                                        <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
+                                        <div class="currency-info">
+                                            <span class="currency-code">{{ code }}</span>
+                                            <span class="currency-name">{{ name }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="to_currency">To</label>
-                        <select name="to" id="to_currency" required>
-                            {% for code, name in currencies %}
-                                <option value="{{ code }}" {% if to_curr == code %}selected{% endif %}>
-                                    {{ code }}
-                                </option>
-                            {% endfor %}
-                        </select>
+                        <label>To</label>
+                        <div class="custom-select-wrapper">
+                            <select name="to" id="to_currency" hidden required>
+                                {% for code, name, country in currencies %}
+                                    <option value="{{ code }}" {% if to_curr == code %}selected{% endif %} data-country="{{ country }}">
+                                        {{ code }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="custom-select" id="to-custom-select">
+                                <img src="https://flagcdn.com/w40/eu.png" class="flag-icon" alt="flag">
+                                <span class="currency-code">EUR</span>
+                            </div>
+                            <div class="select-options" id="to-options">
+                                {% for code, name, country in currencies %}
+                                    <div class="select-option {% if to_curr == code %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
+                                        <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
+                                        <div class="currency-info">
+                                            <span class="currency-code">{{ code }}</span>
+                                            <span class="currency-name">{{ name }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-group time-period-selector">
