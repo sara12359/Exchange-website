@@ -28,9 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Custom Dropdown Logic
-    const initCustomSelect = (wrapperId, selectId) => {
-        const wrapper = document.getElementById(wrapperId);
+    const initCustomSelect = (selectId) => {
         const select = document.getElementById(selectId);
+        if (!select) return;
+        
+        const wrapper = select.closest('.custom-select-wrapper');
         const customSelect = wrapper.querySelector('.custom-select');
         const optionsList = wrapper.querySelector('.select-options');
         const options = wrapper.querySelectorAll('.select-option');
@@ -38,11 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update custom display based on native select
         const updateDisplay = () => {
             const selectedOption = select.options[select.selectedIndex];
+            if (!selectedOption) return;
+            
             const country = selectedOption.getAttribute('data-country');
             const code = selectedOption.value;
             
-            customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
-            customSelect.querySelector('.currency-code').textContent = code;
+            const flagImg = customSelect.querySelector('.flag-icon');
+            if (flagImg) flagImg.src = `https://flagcdn.com/w40/${country}.png`;
+            
+            const codeSpan = customSelect.querySelector('.currency-code');
+            if (codeSpan) codeSpan.textContent = code;
             
             // Update active state in list
             options.forEach(opt => {
@@ -84,8 +91,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', () => closeAllDropdowns());
 
-    const fromDisplay = initCustomSelect('from_currency', 'from_currency').updateDisplay;
-    const toDisplay = initCustomSelect('to_currency', 'to_currency').updateDisplay;
+    initCustomSelect('from_currency');
+    initCustomSelect('to_currency');
 
     // Currency Swap Logic
     const fromSelect = document.getElementById('from_currency');
