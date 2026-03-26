@@ -27,10 +27,70 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // Custom Dropdown Logic
+    const initCustomSelect = (wrapperId, selectId) => {
+        const wrapper = document.getElementById(wrapperId);
+        const select = document.getElementById(selectId);
+        const customSelect = wrapper.querySelector('.custom-select');
+        const optionsList = wrapper.querySelector('.select-options');
+        const options = wrapper.querySelectorAll('.select-option');
+
+        // Update custom display based on native select
+        const updateDisplay = () => {
+            const selectedOption = select.options[select.selectedIndex];
+            const country = selectedOption.getAttribute('data-country');
+            const code = selectedOption.value;
+            
+            customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
+            customSelect.querySelector('.currency-code').textContent = code;
+            
+            // Update active state in list
+            options.forEach(opt => {
+                opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
+            });
+        };
+
+        // Initialize state
+        updateDisplay();
+
+        customSelect.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAllDropdowns(optionsList);
+            optionsList.classList.toggle('show');
+            customSelect.classList.toggle('active');
+        });
+
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.getAttribute('data-value');
+                select.value = value;
+                updateDisplay();
+                optionsList.classList.remove('show');
+                customSelect.classList.remove('active');
+            });
+        });
+
+        return { updateDisplay };
+    };
+
+    const closeAllDropdowns = (except) => {
+        document.querySelectorAll('.select-options').forEach(list => {
+            if (list !== except) {
+                list.classList.remove('show');
+                list.previousElementSibling.classList.remove('active');
+            }
+        });
+    };
+
+    document.addEventListener('click', () => closeAllDropdowns());
+
+    const fromDisplay = initCustomSelect('from_currency', 'from_currency').updateDisplay;
+    const toDisplay = initCustomSelect('to_currency', 'to_currency').updateDisplay;
+
     // Currency Swap Logic
     const fromSelect = document.getElementById('from_currency');
     const toSelect = document.getElementById('to_currency');
-    const form = document.querySelector('form');
+    const converterForm = document.getElementById('converter-form');
     
     // Create a better swap button with modern styles
     const swapBtn = document.createElement('button');
@@ -49,6 +109,33 @@ document.addEventListener('DOMContentLoaded', () => {
         fromSelect.value = toSelect.value;
         toSelect.value = temp;
         
+        // Sync custom displays
+        const fromWrapper = document.getElementById('from-custom-select');
+        const toWrapper = document.getElementById('to-custom-select');
+        
+        // Trigger manual update of custom displays
+        const updateCustomDisplay = (selectEl, customElId) => {
+            const selectedOption = selectEl.options[selectEl.selectedIndex];
+            const country = selectedOption.getAttribute('data-country');
+            const code = selectedOption.value;
+            const customEl = document.getElementById(customElId);
+            customEl.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
+            customEl.querySelector('.currency-code').textContent = code;
+        };
+
+        updateCustomDisplay(fromSelect, 'from-custom-select');
+        updateCustomDisplay(toSelect, 'to-custom-select');
+
+        // Update target options active state
+        document.querySelectorAll('.select-option').forEach(opt => {
+            const val = opt.getAttribute('data-value');
+            if (opt.closest('#from-options')) {
+                opt.classList.toggle('selected', val === fromSelect.value);
+            } else if (opt.closest('#to-options')) {
+                opt.classList.toggle('selected', val === toSelect.value);
+            }
+        });
+        
         // Add rotation animation
         swapBtn.classList.add('rotating');
         setTimeout(() => {
@@ -58,8 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Form submission state
     const convertBtn = document.querySelector('.convert-btn');
-    if (form && convertBtn) {
-        form.addEventListener('submit', () => {
+    if (converterForm && convertBtn) {
+        converterForm.addEventListener('submit', () => {
             convertBtn.innerHTML = '<span class="loading">Processing...</span>';
             convertBtn.style.opacity = '0.7';
             convertBtn.style.pointerEvents = 'none';
