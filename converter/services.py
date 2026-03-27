@@ -1,4 +1,5 @@
 import requests
+import concurrent.futures
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -134,14 +135,24 @@ class ExchangeRateService:
     @staticmethod
     def get_historical_rates_range(base_currency, target_currency, days=7):
         """Fetch historical rates for a range of days."""
-        rates = []
         today = timezone.now().date()
-        for i in range(days):
+        
+        def fetch_rate(i):
             date_obj = today - timedelta(days=i)
             rate = ExchangeRateService.get_historical_rate(date_obj, base_currency, target_currency)
             if rate:
-                rates.append({
+                return {
                     'date': date_obj.strftime('%Y-%m-%d'),
                     'rate': rate
-                })
+                }
+            return None
+
+        rates = []
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(days, 30)) as executor:
+            # Map returns results in the original order (i=0, i=1, ... i=days-1)
+            results = executor.map(fetch_rate, range(days))
+            for res in results:
+                if res:
+                    rates.append(res)
+                    
         return rates[::-1] # Return in chronological order
