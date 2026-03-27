@@ -99,57 +99,59 @@ document.addEventListener('DOMContentLoaded', () => {
     const toSelect = document.getElementById('to_currency');
     const converterForm = document.getElementById('converter-form');
     
-    // Create a better swap button with modern styles
-    const swapBtn = document.createElement('button');
-    swapBtn.type = 'button';
-    swapBtn.className = 'swap-btn';
-    swapBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="3" y1="21" x2="20" y2="4"></line></svg>
-    `;
-    
-    // Position it between the two selects
-    const toGroup = toSelect.closest('.form-group');
-    toGroup.before(swapBtn);
+    if (fromSelect && toSelect && converterForm) {
+        // Create a better swap button with modern styles
+        const swapBtn = document.createElement('button');
+        swapBtn.type = 'button';
+        swapBtn.className = 'swap-btn';
+        swapBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="3" y1="21" x2="20" y2="4"></line></svg>
+        `;
+        
+        // Position it between the two selects
+        const toGroup = toSelect.closest('.form-group');
+        toGroup.before(swapBtn);
 
-    swapBtn.addEventListener('click', () => {
-        const temp = fromSelect.value;
-        fromSelect.value = toSelect.value;
-        toSelect.value = temp;
-        
-        // Sync custom displays by triggering updateDisplay logic
-        // We can just call the init logic again or store the functions
-        // But since we want to be clean, let's just trigger a change event if we had listeners
-        // Or just manually call the update logic. Let's make the update logic accessible.
-        
-        const updateAll = () => {
-            const selects = ['from_currency', 'to_currency'];
-            selects.forEach(id => {
-                const selectEl = document.getElementById(id);
-                const wrapper = selectEl.closest('.custom-select-wrapper');
-                const customSelect = wrapper.querySelector('.custom-select');
-                const options = wrapper.querySelectorAll('.select-option');
-                const selectedOption = selectEl.options[selectEl.selectedIndex];
-                
-                if (selectedOption) {
-                    const country = selectedOption.getAttribute('data-country');
-                    const code = selectedOption.value;
-                    customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
-                    customSelect.querySelector('.currency-code').textContent = code;
-                    options.forEach(opt => {
-                        opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
-                    });
-                }
-            });
-        };
+        swapBtn.addEventListener('click', () => {
+            const temp = fromSelect.value;
+            fromSelect.value = toSelect.value;
+            toSelect.value = temp;
+            
+            // Sync custom displays by triggering updateDisplay logic
+            // We can just call the init logic again or store the functions
+            // But since we want to be clean, let's just trigger a change event if we had listeners
+            // Or just manually call the update logic. Let's make the update logic accessible.
+            
+            const updateAll = () => {
+                const selects = ['from_currency', 'to_currency'];
+                selects.forEach(id => {
+                    const selectEl = document.getElementById(id);
+                    const wrapper = selectEl.closest('.custom-select-wrapper');
+                    const customSelect = wrapper.querySelector('.custom-select');
+                    const options = wrapper.querySelectorAll('.select-option');
+                    const selectedOption = selectEl.options[selectEl.selectedIndex];
+                    
+                    if (selectedOption) {
+                        const country = selectedOption.getAttribute('data-country');
+                        const code = selectedOption.value;
+                        customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
+                        customSelect.querySelector('.currency-code').textContent = code;
+                        options.forEach(opt => {
+                            opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
+                        });
+                    }
+                });
+            };
 
-        updateAll();
-        
-        // Add rotation animation
-        swapBtn.classList.add('rotating');
-        setTimeout(() => {
-            swapBtn.classList.remove('rotating');
-        }, 400);
-    });
+            updateAll();
+            
+            // Add rotation animation
+            swapBtn.classList.add('rotating');
+            setTimeout(() => {
+                swapBtn.classList.remove('rotating');
+            }, 400);
+        });
+    }
 
     // Form submission state
     const convertBtn = document.querySelector('.convert-btn');
