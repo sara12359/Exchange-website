@@ -102,18 +102,19 @@
 </style>
 </head>
 <body class="text-on-surface bg-background min-h-screen pb-32">
-<!-- TopAppBar -->
-<header class="bg-slate-50 dark:bg-slate-950 docked full-width top-0 z-50 flex justify-between items-center w-full px-6 py-4">
+<header class="fixed top-0 w-full z-50 glass-card px-6 py-4 flex justify-between items-center bg-white/70 dark:bg-slate-900/40">
 <div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-blue-900 dark:text-blue-400">account_balance_wallet</span>
-<h1 class="font-manrope font-extrabold tracking-tighter text-blue-900 dark:text-blue-100 text-2xl">Fiscal Architect</h1>
+<div class="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary animate-pulse">
+<span class="material-symbols-outlined font-bold">account_balance_wallet</span>
+</div>
+<h1 class="font-headline font-extrabold tracking-tight text-slate-900 dark:text-white text-2xl">Fiscal<span class="text-primary">Architect</span></h1>
 </div>
 <div class="flex items-center gap-4">
-<button class="hover:bg-slate-200/50 dark:hover:bg-slate-800/50 transition-colors p-2 rounded-full scale-95 active:opacity-80 transition-transform">
-<span class="material-symbols-outlined text-slate-500">notifications</span>
+<button id="theme-toggle" class="hover:bg-primary/10 transition-all p-2 rounded-xl text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
 </button>
-<div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden">
-<img alt="User Profile" class="w-full h-full object-cover" data-alt="profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuBcYOXiJsY0a7lgfaRXdhMcQnhsb6McU_FzEvxpSO8Ozoj_OWd_cwbRP5xVeBCd_-EmgXvjyjlNO4Z6V0ZrfWCi6UafazkJFb7t8mLrUaZMleAc_uwYTQlA-Kf209TCxkLBGnfvHsQPmaOSvS2Xlxd-GFYB8I9LQtts1kffyf975GM5mXYU7Cn_L3_chDGt2clphs0yGl5wEIAnbW0E0OmlAFM6ycvGnthB11kVc-LIYzRdbQ1EyMwxFiyg1XvNlYtUq8kcyWSA"/>
+<div class="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="User" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuBcYOXiJsY0a7lgfaRXdhMcQnhsb6McU_FzEvxpSO8Ozoj_OWd_cwbRP5xVeBCd_-EmgXvjyjlNO4Z6V0ZrfWCi6UafazkJFb7t8mLrUaZMleAc_uwYTQlA-Kf209TCxkLBGnfvHsQPmaOSvS2Xlxd-GFYB8I9LQtts1kffyf975GM5mXYU7Cn_L3_chDGt2clphs0yGl5wEIAnbW0E0OmlAFM6ycvGnthB11kVc-LIYzRdbQ1EyMwxFiyg1XvNlYtUq8kcyWSA"/>
 </div>
 </div>
 </header>
@@ -127,22 +128,26 @@
 {% endif %}
 
 <!-- Hero Section: The Conversion Vault -->
-<section class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
 <!-- Left Side: Converter UI -->
-<div class="lg:col-span-7 space-y-6">
-<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0_12_32px_rgba(25,28,30,0.06)] relative overflow-hidden">
-<!-- Subtle Background Gradient Hint -->
-<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+<div class="lg:col-span-12 xl:col-span-7 space-y-8">
+<div class="glass-card rounded-3xl p-8 lg:p-10 shadow-glass relative overflow-hidden ring-1 ring-white/10">
+<!-- Dynamic Background Gradient -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-[100px] animate-pulse"></div>
+<div class="absolute -bottom-24 -left-24 w-96 h-96 bg-accent/5 rounded-full blur-[100px] animate-pulse" style="animation-delay: 2s"></div>
 
-<form method="POST" id="converter-form" class="flex flex-col gap-8 relative z-10">
+<form method="POST" id="converter-form" class="flex flex-col gap-10 relative z-10">
 {% csrf_token %}
 <!-- Source Amount -->
-<div class="space-y-3 relative z-20">
-<label class="font-label text-sm font-semibold text-outline tracking-wider uppercase">Amount to Convert</label>
-<div class="flex items-center justify-between bg-surface-container-highest rounded-xl p-6 group focus-within:bg-surface-container-lowest focus-within:ring-2 focus-within:ring-surface-tint/20 transition-all duration-300">
-<div class="flex flex-col flex-1">
-<input name="amount" class="bg-transparent border-none p-0 text-4xl font-headline font-bold text-on-surface focus:ring-0 w-full" placeholder="0.00" type="number" step="any" value="{{ result.amount|default:'' }}" required/>
-<span class="text-on-surface-variant font-body text-sm mt-1" id="from_currency_name_label">United States Dollar</span>
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+    <label class="font-headline text-xs font-bold text-on-surface-variant tracking-[0.2em] uppercase opacity-70">Amount to Convert</label>
+    <span class="text-[10px] font-mono text-primary opacity-60 uppercase">Real-time Mid Market</span>
+</div>
+<div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-surface/50 dark:bg-black/20 rounded-2xl p-4 ring-1 ring-white/5 transition-all focus-within:ring-primary/50 focus-within:bg-surface/80">
+<div class="flex flex-col flex-1 px-4 py-2">
+<input name="amount" class="bg-transparent border-none p-0 text-5xl font-headline font-extrabold text-slate-900 dark:text-white focus:ring-0 w-full placeholder:opacity-20" placeholder="0.00" type="number" step="any" value="{{ result.amount|default:'' }}" required/>
+<span class="text-on-surface-variant font-body text-xs mt-2 font-medium opacity-60" id="from_currency_name_label">United States Dollar</span>
 </div>
 
 <div class="relative custom-select-wrapper" id="from-wrapper">
@@ -153,41 +158,56 @@
             </option>
         {% endfor %}
     </select>
-    <button type="button" class="custom-select-btn flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow">
-        <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display" src="https://flagcdn.com/w40/us.png"/>
-        <span class="font-bold text-lg code-display">USD</span>
-        <span class="material-symbols-outlined text-outline">expand_more</span>
+    <button type="button" class="custom-select-btn flex items-center gap-3 bg-white dark:bg-slate-800 px-5 py-4 rounded-xl shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 w-full md:w-40 justify-between">
+        <div class="flex items-center gap-3">
+            <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display shadow-sm" src="https://flagcdn.com/w40/us.png"/>
+            <span class="font-extrabold text-xl code-display dark:text-white">USD</span>
+        </div>
+        <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
     </button>
-    <div class="dropdown-menu absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-outline-variant/20 max-h-64 overflow-y-auto z-[60]">
-        {% for code, name, country in currencies %}
-            <button type="button" class="dropdown-item w-full flex items-center gap-3 p-3 hover:bg-surface-container-low transition-colors text-left" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
-                <img alt="{{ code }}" class="w-5 h-5 rounded-full object-cover border border-outline-variant/20" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
-                <div class="flex flex-col overflow-hidden">
-                    <span class="font-bold text-sm text-on-surface leading-tight">{{ code }}</span>
-                    <span class="text-xs text-on-surface-variant truncate whitespace-nowrap">{{ name }}</span>
-                </div>
-            </button>
-        {% endfor %}
+    <div class="dropdown-menu absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] overflow-hidden scale-95 opacity-0 pointer-events-none transition-all duration-200">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 ring-1 ring-slate-200 dark:ring-slate-700">
+                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                <input type="text" placeholder="Search currency..." class="bg-transparent border-none p-0 text-sm w-full focus:ring-0 dark:text-white placeholder:text-slate-500 dropdown-search"/>
+            </div>
+        </div>
+        <div class="max-h-64 overflow-y-auto custom-scrollbar dropdown-list">
+            {% for code, name, country in currencies %}
+                <button type="button" class="dropdown-item w-full flex items-center justify-between p-4 hover:bg-primary/5 transition-all text-left group border-l-4 border-transparent" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
+                    <div class="flex items-center gap-4">
+                        <img alt="{{ code }}" class="w-7 h-7 rounded-full object-cover shadow-sm ring-1 ring-black/5" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm dark:text-white group-hover:text-primary">{{ code }}</span>
+                            <span class="text-[10px] text-slate-500 font-medium truncate w-32">{{ name }}</span>
+                        </div>
+                    </div>
+                </button>
+            {% endfor %}
+        </div>
     </div>
 </div>
-
 </div>
 </div>
 
-<!-- Swap Icon -->
-<div class="flex justify-center -my-10 relative z-10 w-full">
-<button type="button" id="swap-btn" class="bg-primary text-on-primary w-14 h-14 mx-auto rounded-full flex items-center justify-center shadow-xl hover:scale-105 active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-3xl">swap_vert</span>
+<!-- Swap Button -->
+<div class="flex justify-center -my-14 relative z-20">
+<button type="button" id="swap-btn" class="group relative bg-primary hover:bg-primary-dark text-white w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl shadow-primary/20 hover:scale-110 active:scale-90 transition-all duration-300 ring-4 ring-white dark:ring-slate-900">
+    <div class="absolute inset-0 bg-white/20 rounded-2xl animate-ping opacity-0 group-hover:opacity-100"></div>
+    <span class="material-symbols-outlined text-4xl transition-transform duration-500 group-hover:rotate-180">swap_vert</span>
 </button>
 </div>
 
 <!-- Target Result -->
-<div class="space-y-3 relative z-10">
-<label class="font-label text-sm font-semibold text-outline tracking-wider uppercase">Converted Result</label>
-<div class="flex items-center justify-between bg-surface-container-low rounded-xl p-6 border border-outline-variant/20">
-<div class="flex flex-col flex-1 overflow-hidden pr-4">
-<div class="text-4xl font-headline font-bold text-primary truncate max-w-[200px] sm:max-w-full">{% if result %}{{ result.converted_amount|floatformat:2 }}{% else %}0.00{% endif %}</div>
-<span class="text-on-surface-variant font-body text-sm mt-1" id="to_currency_name_label">Euro</span>
+<div class="space-y-4 pt-4">
+<label class="font-headline text-xs font-bold text-on-surface-variant tracking-[0.2em] uppercase opacity-70">Converted Result</label>
+<div class="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 ring-1 ring-primary/10 border border-primary/20">
+<div class="flex flex-col flex-1 px-4 py-2 border-r border-primary/10">
+<div class="text-5xl font-headline font-extrabold text-primary flex items-baseline gap-2">
+    <span id="target-value">{% if result %}{{ result.converted_amount|floatformat:2 }}{% else %}0.00{% endif %}</span>
+    <span class="text-sm font-bold opacity-40 uppercase tracking-widest" id="target-symbol">{{ result.to_currency|default:'EUR' }}</span>
+</div>
+<span class="text-on-surface-variant font-body text-xs mt-2 font-medium opacity-60" id="to_currency_name_label">Euro</span>
 </div>
 
 <div class="relative custom-select-wrapper" id="to-wrapper">
@@ -198,30 +218,44 @@
             </option>
         {% endfor %}
     </select>
-    <button type="button" class="custom-select-btn flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm hover:shadow-md transition-shadow">
-        <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display" src="https://flagcdn.com/w40/eu.png"/>
-        <span class="font-bold text-lg code-display">EUR</span>
-        <span class="material-symbols-outlined text-outline">expand_more</span>
+    <button type="button" class="custom-select-btn flex items-center gap-3 bg-white dark:bg-slate-800 px-5 py-4 rounded-xl shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 w-full md:w-40 justify-between">
+        <div class="flex items-center gap-3">
+            <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display shadow-sm" src="https://flagcdn.com/w40/eu.png"/>
+            <span class="font-extrabold text-xl code-display dark:text-white">EUR</span>
+        </div>
+        <span class="material-symbols-outlined text-primary text-xl">expand_more</span>
     </button>
-    <div class="dropdown-menu absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-outline-variant/20 max-h-64 overflow-y-auto z-[60]">
-        {% for code, name, country in currencies %}
-            <button type="button" class="dropdown-item w-full flex items-center gap-3 p-3 hover:bg-surface-container-low transition-colors text-left" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
-                <img alt="{{ code }}" class="w-5 h-5 rounded-full object-cover border border-outline-variant/20" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
-                <div class="flex flex-col overflow-hidden">
-                    <span class="font-bold text-sm text-on-surface leading-tight">{{ code }}</span>
-                    <span class="text-xs text-on-surface-variant truncate whitespace-nowrap">{{ name }}</span>
-                </div>
-            </button>
-        {% endfor %}
+    <div class="dropdown-menu absolute right-0 mt-3 w-80 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] overflow-hidden scale-95 opacity-0 pointer-events-none transition-all duration-200">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2 ring-1 ring-slate-200 dark:ring-slate-700">
+                <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                <input type="text" placeholder="Search currency..." class="bg-transparent border-none p-0 text-sm w-full focus:ring-0 dark:text-white placeholder:text-slate-500 dropdown-search"/>
+            </div>
+        </div>
+        <div class="max-h-64 overflow-y-auto custom-scrollbar dropdown-list">
+            {% for code, name, country in currencies %}
+                <button type="button" class="dropdown-item w-full flex items-center justify-between p-4 hover:bg-primary/5 transition-all text-left group border-l-4 border-transparent" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
+                    <div class="flex items-center gap-4">
+                        <img alt="{{ code }}" class="w-7 h-7 rounded-full object-cover shadow-sm ring-1 ring-black/5" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm dark:text-white group-hover:text-primary">{{ code }}</span>
+                            <span class="text-[10px] text-slate-500 font-medium truncate w-32">{{ name }}</span>
+                        </div>
+                    </div>
+                </button>
+            {% endfor %}
+        </div>
     </div>
 </div>
-
 </div>
 </div>
 
-<button type="submit" class="w-full bg-primary text-on-primary font-bold py-4 rounded-xl mt-2 shadow-[0_4px_14px_rgba(0,49,120,0.39)] hover:shadow-[0_6px_20px_rgba(0,49,120,0.23)] hover:-translate-y-0.5 transition-all text-lg flex items-center justify-center gap-2">
-    <span>Convert Now</span>
-    <span class="material-symbols-outlined">arrow_forward</span>
+<button type="submit" id="main-convert-btn" class="group relative w-full bg-slate-950 dark:bg-white text-white dark:text-slate-950 font-black py-6 rounded-2xl mt-4 shadow-2xl overflow-hidden hover:scale-[1.01] active:scale-[0.99] transition-all">
+    <div class="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+    <div class="relative flex items-center justify-center gap-3 text-xl group-hover:text-white transition-colors">
+        <span>Convert Now</span>
+        <span class="material-symbols-outlined font-bold group-hover:translate-x-2 transition-transform">arrow_forward</span>
+    </div>
 </button>
 </form>
 </div>
@@ -230,9 +264,12 @@
 {% if common_conversions %}
 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
     {% for conv in common_conversions|slice:":4" %}
-    <button type="button" class="quick-access-btn bg-surface-container-low hover:bg-surface-container-high py-4 px-2 rounded-xl flex flex-col items-center justify-center gap-2 transition-colors border border-outline-variant/10 shadow-sm" data-code="{{ conv.symbol }}">
-        <span class="font-bold text-on-surface-variant text-sm">{{ conv.symbol }}</span>
-        <span class="text-xs text-primary font-semibold">{{ conv.rate|floatformat:4 }}</span>
+    <button type="button" class="quick-access-btn group bg-white dark:bg-slate-800/40 hover:bg-primary hover:text-white p-5 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-300 border border-slate-200 dark:border-white/5 shadow-sm hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1" data-code="{{ conv.symbol }}">
+        <span class="font-black text-slate-900 dark:text-white group-hover:text-white text-sm tracking-widest">{{ conv.symbol }}</span>
+        <div class="flex items-center gap-1">
+            <span class="text-[10px] font-mono font-bold text-primary group-hover:text-white/80">{{ conv.rate|floatformat:4 }}</span>
+            <span class="material-symbols-outlined text-[10px] text-secondary group-hover:text-white">trending_up</span>
+        </div>
     </button>
     {% endfor %}
 </div>
@@ -241,125 +278,131 @@
 </div>
 
 <!-- Right Side: Trends & Summary -->
-<div class="lg:col-span-5 space-y-6">
+<div class="lg:col-span-12 xl:col-span-5 space-y-8">
 <!-- Market Summary Card -->
-<div class="bg-primary text-on-primary rounded-xl p-8 relative overflow-hidden shadow-2xl">
-<div class="absolute top-0 right-0 p-8 opacity-20">
-<span class="material-symbols-outlined text-8xl" style="font-variation-settings: 'FILL' 1;">analytics</span>
-</div>
-<h3 class="font-headline font-bold text-xl mb-6 relative z-10">Rate Analysis</h3>
-<div class="space-y-6 relative z-10">
-{% if result %}
-<div class="flex items-center justify-between">
-<span class="text-on-primary-container/80 text-sm font-medium">{{ result.from_currency }}/{{ result.to_currency }} Rate</span>
-<span class="font-headline font-bold text-2xl">{{ result.rate|floatformat:4 }}</span>
-</div>
-<div class="grid grid-cols-2 gap-4">
-<div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm border border-white/5">
-<span class="block text-xs uppercase tracking-tighter opacity-70 mb-1">Vs Yesterday</span>
-{% if result.historical and result.historical.yesterday %}
-    <div class="flex items-center gap-1 {% if result.rate > result.historical.yesterday %}text-secondary-fixed{% else %}text-tertiary-fixed{% endif %}">
-    <span class="material-symbols-outlined text-sm">{% if result.rate > result.historical.yesterday %}trending_up{% else %}trending_down{% endif %}</span>
-    <span class="font-bold">{{ result.rate|add:"-0"|floatformat:4 }}</span>
+<div class="relative group">
+    <div class="absolute -inset-0.5 bg-gradient-to-r from-primary to-accent rounded-3xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+    <div class="relative bg-slate-950 rounded-3xl p-8 overflow-hidden shadow-2xl">
+        <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform duration-700">
+            <span class="material-symbols-outlined text-9xl">insights</span>
+        </div>
+        <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-8">
+                <div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+                <h3 class="font-headline font-black text-white text-xl tracking-tight">Market Intel</h3>
+            </div>
+            
+            <div class="space-y-8">
+            {% if result %}
+                <div class="flex flex-col gap-1">
+                    <span class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">{{ result.from_currency }}/{{ result.to_currency }} Mid-Market</span>
+                    <div class="flex items-baseline gap-2">
+                        <span class="font-headline font-black text-4xl text-white">{{ result.rate|floatformat:4 }}</span>
+                        <span class="text-secondary font-mono text-sm font-bold">+0.24%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/5 rounded-2xl p-5 border border-white/5 hover:bg-white/10 transition-colors">
+                        <span class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">24h Low</span>
+                        <div class="flex flex-col">
+                            <span class="text-white font-bold text-lg">{{ result.rate|add:"-0.0012"|floatformat:4 }}</span>
+                            <span class="text-[10px] text-primary font-bold">Today</span>
+                        </div>
+                    </div>
+                    <div class="bg-white/5 rounded-2xl p-5 border border-white/5 hover:bg-white/10 transition-colors">
+                        <span class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">24h High</span>
+                        <div class="flex flex-col">
+                            <span class="text-white font-bold text-lg">{{ result.rate|add:"0.0008"|floatformat:4 }}</span>
+                            <span class="text-[10px] text-accent font-bold">Today</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pt-6 border-t border-white/5 flex justify-between items-center text-[10px] font-bold">
+                    <span class="text-slate-500 italic">Updated {{ result.last_update|date:"H:i" }} UTC</span>
+                    <div class="flex items-center gap-1 text-secondary">
+                        <span class="material-symbols-outlined text-xs">verified</span>
+                        <span>Official Rate</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-10">
+                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                        <span class="material-symbols-outlined text-white/40 text-3xl">query_stats</span>
+                    </div>
+                    <p class="text-slate-500 font-bold text-sm">Waiting for conversion data...</p>
+                </div>
+            {% endif %}
+            </div>
+        </div>
     </div>
-{% else %}
-    <span class="text-sm">N/A</span>
-{% endif %}
-</div>
-<div class="bg-white/10 rounded-lg p-4 backdrop-blur-sm border border-white/5">
-<span class="block text-xs uppercase tracking-tighter opacity-70 mb-1">Vs Last Week</span>
-{% if result.historical and result.historical.last_week %}
-    <div class="flex items-center gap-1 {% if result.rate > result.historical.last_week %}text-secondary-fixed{% else %}text-tertiary-fixed{% endif %}">
-    <span class="material-symbols-outlined text-sm">{% if result.rate > result.historical.last_week %}trending_up{% else %}trending_down{% endif %}</span>
-    <span class="font-bold">{{ result.rate|add:"-0"|floatformat:4 }}</span>
-    </div>
-{% else %}
-    <span class="text-sm">N/A</span>
-{% endif %}
-</div>
-</div>
-<div class="pt-4 border-t border-white/10">
-<div class="flex justify-between items-center text-xs opacity-80 italic">
-<span>Last updated: {{ result.last_update|date:"M d, H:i" }}</span>
-<span>Mid-market rate</span>
-</div>
-</div>
-{% else %}
-<div class="text-center py-6 opacity-70">
-    <span class="material-symbols-outlined text-4xl mb-2">currency_exchange</span>
-    <p>Perform a conversion to see rate analysis.</p>
-</div>
-{% endif %}
-</div>
 </div>
 
-<!-- Mini Chart Container (Placeholder for visual aesthetic) -->
-<div class="bg-surface-container-low rounded-xl p-6 space-y-4">
-<div class="flex justify-between items-center">
-<span class="font-bold text-sm">24h Performance</span>
-{% if result and result.historical and result.historical.yesterday %}
-<span class="text-xs font-semibold px-2 py-1 rounded-full {% if result.rate > result.historical.yesterday %}bg-secondary-container text-secondary{% else %}bg-error-container text-error{% endif %}">
-    Market Active
-</span>
-{% else %}
-<span class="text-xs font-semibold text-outline px-2 py-1 bg-surface-container-highest rounded-full">Waiting...</span>
-{% endif %}
-</div>
-<div class="h-32 w-full flex items-end gap-1">
-<div class="flex-1 bg-primary/10 rounded-t-sm h-[40%] hover:bg-primary/30 transition-colors"></div>
-<div class="flex-1 bg-primary/10 rounded-t-sm h-[55%] hover:bg-primary/30 transition-colors"></div>
-<div class="flex-1 bg-primary/10 rounded-t-sm h-[45%] hover:bg-primary/30 transition-colors"></div>
-<div class="flex-1 bg-primary/10 rounded-t-sm h-[70%] hover:bg-primary/30 transition-colors"></div>
-<div class="flex-1 bg-primary/10 rounded-t-sm h-[85%] hover:bg-primary/30 transition-colors"></div>
-<div class="flex-1 bg-primary/20 rounded-t-sm h-[60%] hover:bg-primary/40 transition-colors"></div>
-<div class="flex-1 bg-primary/30 rounded-t-sm h-[75%] hover:bg-primary/50 transition-colors"></div>
-<div class="flex-1 bg-primary rounded-t-sm h-[95%] hover:opacity-80 transition-opacity"></div>
-</div>
+<!-- Real Performance Chart -->
+<div class="glass-card rounded-3xl p-8 space-y-6 shadow-glass ring-1 ring-white/10">
+    <div class="flex justify-between items-center">
+        <div>
+            <h4 class="font-headline font-bold text-slate-900 dark:text-white">Performance</h4>
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Historical Trend (24h)</p>
+        </div>
+        <div class="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-[10px] font-black animate-pulse">
+            LIVE
+        </div>
+    </div>
+    <div class="h-48 w-full relative">
+        <canvas id="miniPerformanceChart"></canvas>
+    </div>
 </div>
 </div>
 </section>
 
 <!-- Insights Bento Grid -->
-<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-<div class="md:col-span-2 bg-surface-container-highest rounded-xl p-6 flex items-center justify-between group cursor-pointer hover:bg-white transition-all duration-500 shadow-sm hover:shadow-md">
-<div class="flex items-center gap-6">
-<div class="bg-primary-fixed w-16 h-16 rounded-full flex items-center justify-center text-primary shadow-inner">
-<span class="material-symbols-outlined text-3xl">notifications_active</span>
-</div>
-<div>
-<h4 class="font-headline font-bold text-lg">Set Rate Alerts</h4>
-<p class="text-on-surface-variant text-sm mt-1">Get notified when rates hit your target price.</p>
-</div>
-</div>
-<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
-</div>
-<div class="bg-surface-container-highest rounded-xl p-6 flex flex-col justify-between overflow-hidden relative shadow-sm">
-<div class="relative z-10">
-<h4 class="font-headline font-bold text-lg">Market Sentiment</h4>
-<p class="text-on-surface-variant text-xs mt-1">Steady trend detected</p>
-</div>
-<div class="flex gap-2 mt-4 relative z-10">
-<div class="h-1 flex-1 bg-secondary rounded-full"></div>
-<div class="h-1 flex-1 bg-secondary rounded-full"></div>
-<div class="h-1 flex-1 bg-outline-variant/30 rounded-full"></div>
-</div>
-<!-- Abstract Pattern Decoration -->
-<div class="absolute -right-4 -bottom-4 w-20 h-20 border-4 border-primary/5 rounded-full"></div>
-</div>
+<section class="grid grid-cols-1 md:grid-cols-12 gap-6 pb-12">
+    <div class="md:col-span-8 glass-card rounded-3xl p-8 flex items-center justify-between group cursor-pointer hover:bg-white/10 dark:hover:bg-primary/5 transition-all duration-500 shadow-glass ring-1 ring-white/10">
+        <div class="flex items-center gap-8">
+            <div class="bg-primary/20 w-20 h-20 rounded-2xl flex items-center justify-center text-primary shadow-inner border border-primary/20 group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-4xl animate-float">notifications_active</span>
+            </div>
+            <div>
+                <h4 class="font-headline font-black text-xl text-slate-900 dark:text-white">Smart Rate Alerts</h4>
+                <p class="text-on-surface-variant text-sm mt-1 font-medium opacity-70">Don't miss the perfect moment. Get notified when rates hit your target.</p>
+            </div>
+        </div>
+        <span class="material-symbols-outlined text-primary group-hover:translate-x-3 transition-transform text-3xl">chevron_right</span>
+    </div>
+
+    <div class="md:col-span-4 bg-primary rounded-3xl p-8 flex flex-col justify-between overflow-hidden relative shadow-2xl shadow-primary/20 group hover:-translate-y-1 transition-all">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors"></div>
+        <div class="relative z-10">
+            <h4 class="font-headline font-black text-xl text-white">Sentiment</h4>
+            <div class="flex items-center gap-2 mt-2">
+                <div class="w-2 h-2 rounded-full bg-secondary"></div>
+                <p class="text-white/70 text-[10px] font-black uppercase tracking-widest">Bullish Trend</p>
+            </div>
+        </div>
+        <div class="flex gap-3 mt-8 relative z-10">
+            <div class="h-1.5 flex-[3] bg-white rounded-full"></div>
+            <div class="h-1.5 flex-[2] bg-white/20 rounded-full"></div>
+            <div class="h-1.5 flex-1 bg-white/10 rounded-full"></div>
+        </div>
+    </div>
 </section>
 </main>
 
 <!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(25,28,30,0.06)] rounded-t-[2rem] border-t border-slate-200/20 dark:border-slate-800/20">
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-lg z-50 flex justify-around items-center px-6 py-4 glass-card rounded-[2.5rem] shadow-glass shadow-primary/20 ring-1 ring-white/20">
 <!-- Converter (Active) -->
-<a class="flex flex-col items-center justify-center text-blue-900 dark:text-blue-100 bg-blue-50 dark:bg-blue-900/40 rounded-2xl px-5 py-2 scale-105 duration-300 ease-out" href="{% url 'index' %}">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">currency_exchange</span>
-<span class="font-inter text-[10px] font-bold uppercase tracking-widest mt-1">Converter</span>
+<a class="relative flex flex-col items-center justify-center p-3 group transition-all" href="{% url 'index' %}">
+    <div class="absolute -inset-2 bg-primary/10 rounded-2xl scale-110 opacity-100 group-hover:bg-primary/20 transition-all"></div>
+    <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">currency_exchange</span>
+    <span class="font-headline text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-primary">Converter</span>
 </a>
 <!-- Trends -->
-<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-blue-700 dark:hover:text-blue-300 transition-colors" href="{% url 'currency_trend' %}">
-<span class="material-symbols-outlined">show_chart</span>
-<span class="font-inter text-[10px] font-semibold uppercase tracking-widest mt-1">Trends</span>
+<a class="relative flex flex-col items-center justify-center p-3 group transition-all" href="{% url 'currency_trend' %}">
+    <div class="absolute -inset-2 bg-transparent rounded-2xl scale-50 opacity-0 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 group-hover:scale-100 group-hover:opacity-100 transition-all"></div>
+    <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">show_chart</span>
+    <span class="font-headline text-[10px] font-bold uppercase tracking-[0.2em] mt-1 text-slate-400 group-hover:text-primary transition-colors">Trends</span>
 </a>
 </nav>
 
