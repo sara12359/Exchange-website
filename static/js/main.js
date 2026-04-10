@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDark = html.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         updateThemeUI(isDark);
+        console.log('Theme toggled. Dark mode:', isDark);
     };
 
     // Init Theme
@@ -64,10 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach(item => {
                 const code = item.getAttribute('data-value').toLowerCase();
                 const name = item.getAttribute('data-name').toLowerCase();
-                if (code.includes(q) || name.includes(q)) {
-                    item.style.display = 'flex';
+                const matches = code.includes(q) || name.includes(q);
+                item.classList.toggle('hidden', !matches);
+                // Also ensure it's not 'flex' if hidden
+                if (!matches) {
+                    item.classList.remove('flex');
                 } else {
-                    item.style.display = 'none';
+                    item.classList.add('flex');
                 }
             });
         };
@@ -136,22 +140,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Swap Button Logic ---
     const swapBtn = document.getElementById('swap-btn');
-    swapBtn?.addEventListener('click', () => {
+    swapBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const fromSelect = document.getElementById('from_currency');
         const toSelect = document.getElementById('to_currency');
         
-        const temp = fromSelect.value;
-        fromSelect.value = toSelect.value;
-        toSelect.value = temp;
+        if (!fromSelect || !toSelect) return;
 
-        fromControl.updateDisplay();
-        toControl.updateDisplay();
+        const tempVal = fromSelect.value;
+        fromSelect.value = toSelect.value;
+        toSelect.value = tempVal;
+
+        // Trigger updates
+        if (fromControl) fromControl.updateDisplay();
+        if (toControl) toControl.updateDisplay();
+
+        console.log('Currencies swapped:', fromSelect.value, 'to', toSelect.value);
 
         // Visual feedback for result update
         const targetValue = document.getElementById('target-value');
         if (targetValue) {
-            targetValue.style.opacity = '0.3';
-            setTimeout(() => targetValue.style.opacity = '1', 300);
+            targetValue.classList.add('opacity-30', 'scale-95');
+            setTimeout(() => targetValue.classList.remove('opacity-30', 'scale-95'), 200);
         }
     });
 
@@ -172,14 +184,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Performance Chart ---
     const initChart = () => {
-        const ctx = document.getElementById('miniPerformanceChart')?.getContext('2d');
+        const canvas = document.getElementById('miniPerformanceChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Generate semi-random data for visual appeal (simulating 24h)
-        const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
-        const data = Array.from({length: 24}, () => Math.random() * 10 + 90);
+        // Clean up old chart if exists
+        if (window.myMiniChart) window.myMiniChart.destroy();
 
-        new Chart(ctx, {
+        const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+        const data = Array.from({length: 24}, () => Math.random() * 5 + 95);
+
+        window.myMiniChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
@@ -192,8 +208,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     tension: 0.4,
                     fill: true,
                     backgroundColor: (context) => {
-                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 200);
-                        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 150);
+                        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
                         gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
                         return gradient;
                     }
@@ -202,13 +218,15 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: { duration: 2000, easing: 'easeOutQuart' },
                 plugins: { legend: { display: false }, tooltip: { enabled: false } },
                 scales: {
                     x: { display: false },
-                    y: { display: false }
+                    y: { display: false, min: 90, max: 105 }
                 }
             }
         });
+        console.log('Homepage chart initialized');
     };
 
     initChart();
