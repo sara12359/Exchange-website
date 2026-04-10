@@ -1,231 +1,352 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html class="light" lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Trends | Real-time Exchange Rates</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .chart-container {
-            margin-top: 2.5rem;
-            background: var(--input-bg);
-            padding: 1.5rem;
-            border-radius: 24px;
-            border: 1px solid var(--card-border);
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-        }
-        .trend-controls {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-        .time-period-selector {
-            grid-column: span 2;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Fiscal Architect - Historical Trends</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#4f46e5",
+              "primary-dark": "#3730a3",
+              "secondary": "#10b981",
+              "accent": "#8b5cf6",
+              "background": "#0f172a",
+              "surface": "#1e293b",
+              "surface-light": "#334155",
+              "on-surface": "#f8fafc",
+              "on-surface-variant": "#94a3b8",
+              "outline": "#475569"
+            },
+            fontFamily: {
+              "headline": ["Manrope", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+            boxShadow: {
+              "glass": "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+              "glow": "0 0 15px rgba(79, 70, 229, 0.4)"
+            }
+          },
+        },
+      }
+</script>
+<style>
+      :root {
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
+      .dark {
+        --glass-bg: rgba(15, 23, 42, 0.4);
+        --glass-border: rgba(255, 255, 255, 0.05);
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .glass-card {
+        background: var(--glass-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+      }
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8fafc;
+      }
+      .dark body {
+        background-color: #0f172a;
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
+        background-attachment: fixed;
+      }
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+      }
+</style>
 </head>
-<body>
-    <button class="theme-toggle" id="theme-toggle" aria-label="Toggle brightness">
-        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-    </button>
+<body class="text-on-surface bg-background min-h-screen pb-32">
 
-    <div class="bg-blur bg-blur-1"></div>
-    <div class="bg-blur bg-blur-2"></div>
+<header class="fixed top-0 w-full z-50 glass-card px-6 py-4 flex justify-between items-center bg-white/70 dark:bg-slate-900/40">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center text-primary shadow-inner">
+<span class="material-symbols-outlined font-bold">show_chart</span>
+</div>
+<h1 class="font-headline font-extrabold tracking-tight text-slate-900 dark:text-white text-2xl">Fiscal<span class="text-primary">Trends</span></h1>
+</div>
+<div class="flex items-center gap-4">
+<button id="theme-toggle" class="hover:bg-primary/10 transition-all p-2 rounded-xl text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined" id="theme-icon">dark_mode</span>
+</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="User" class="w-full h-full rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuBcYOXiJsY0a7lgfaRXdhMcQnhsb6McU_FzEvxpSO8Ozoj_OWd_cwbRP5xVeBCd_-EmgXvjyjlNO4Z6V0ZrfWCi6UafazkJFb7t8mLrUaZMleAc_uwYTQlA-Kf209TCxkLBGnfvHsQPmaOSvS2Xlxd-GFYB8I9LQtts1kffyf975GM5mXYU7Cn_L3_back-profile"/>
+</div>
+</div>
+</header>
 
-    <div class="container">
-        <div class="nav-links">
-            <a href="{% url 'index' %}" class="nav-link">Converter</a>
-            <a href="{% url 'currency_trend' %}" class="nav-link active">Trends</a>
-        </div>
-
-        <div class="card">
-            <h1>Currency Trends</h1>
-            <p class="subtitle">Historical exchange rate analysis</p>
-
-            <form method="GET">
-                <div class="trend-controls">
-                    <div class="form-group">
-                        <label>From</label>
-                        <div class="custom-select-wrapper">
+<main class="max-w-6xl mx-auto px-6 pt-24 space-y-12">
+    <section class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+        <!-- Controls Sidebar -->
+        <div class="xl:col-span-4 space-y-6">
+            <div class="glass-card rounded-3xl p-8 shadow-glass ring-1 ring-white/10">
+                <h3 class="font-headline font-black text-slate-900 dark:text-white text-xl mb-6">Historical Analysis</h3>
+                
+                <form method="GET" class="space-y-6">
+                    <!-- From -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Base Currency</label>
+                        <div class="relative custom-select-wrapper" id="from-wrapper">
                             <select name="from" id="from_currency" hidden required>
                                 {% for code, name, country in currencies %}
-                                    <option value="{{ code }}" {% if from_curr == code %}selected{% endif %} data-country="{{ country }}">
+                                    <option value="{{ code }}" {% if from_curr == code %}selected{% endif %} data-country="{{ country }}" data-name="{{ name }}">
                                         {{ code }}
                                     </option>
                                 {% endfor %}
                             </select>
-                            <div class="custom-select" id="from-custom-select">
-                                <img src="https://flagcdn.com/w40/us.png" class="flag-icon" alt="flag">
-                                <span class="currency-code">USD</span>
-                            </div>
-                            <div class="select-options" id="from-options">
-                                {% for code, name, country in currencies %}
-                                    <div class="select-option {% if from_curr == code %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
-                                        <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
-                                        <div class="currency-info">
-                                            <span class="currency-code">{{ code }}</span>
-                                            <span class="currency-name">{{ name }}</span>
-                                        </div>
+                            <button type="button" class="custom-select-btn flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 w-full justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display" src="https://flagcdn.com/w40/{% if from_curr_country %}{{ from_curr_country }}{% else %}us{% endif %}.png"/>
+                                    <span class="font-bold text-lg code-display dark:text-white">{{ from_curr|default:'USD' }}</span>
+                                </div>
+                                <span class="material-symbols-outlined text-primary">expand_more</span>
+                            </button>
+                            <!-- Searchable Dropdown Menu -->
+                            <div class="dropdown-menu absolute left-0 mt-3 w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] overflow-hidden scale-95 opacity-0 pointer-events-none transition-all duration-200">
+                                <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+                                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2">
+                                        <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                                        <input type="text" placeholder="Filter..." class="bg-transparent border-none p-0 text-sm w-full focus:ring-0 dropdown-search dark:text-white"/>
                                     </div>
-                                {% endfor %}
+                                </div>
+                                <div class="max-h-60 overflow-y-auto custom-scrollbar dropdown-list">
+                                    {% for code, name, country in currencies %}
+                                        <button type="button" class="dropdown-item w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-all text-left group" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
+                                            <img alt="{{ code }}" class="w-7 h-7 rounded-full object-cover shadow-sm" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-sm dark:text-white">{{ code }}</span>
+                                                <span class="text-[10px] text-slate-500 font-medium truncate w-32">{{ name }}</span>
+                                            </div>
+                                        </button>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label>To</label>
-                        <div class="custom-select-wrapper">
+                    <!-- To -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Target Currency</label>
+                        <div class="relative custom-select-wrapper" id="to-wrapper">
                             <select name="to" id="to_currency" hidden required>
                                 {% for code, name, country in currencies %}
-                                    <option value="{{ code }}" {% if to_curr == code %}selected{% endif %} data-country="{{ country }}">
+                                    <option value="{{ code }}" {% if to_curr == code %}selected{% endif %} data-country="{{ country }}" data-name="{{ name }}">
                                         {{ code }}
                                     </option>
                                 {% endfor %}
                             </select>
-                            <div class="custom-select" id="to-custom-select">
-                                <img src="https://flagcdn.com/w40/eu.png" class="flag-icon" alt="flag">
-                                <span class="currency-code">EUR</span>
-                            </div>
-                            <div class="select-options" id="to-options">
-                                {% for code, name, country in currencies %}
-                                    <div class="select-option {% if to_curr == code %}selected{% endif %}" data-value="{{ code }}" data-country="{{ country }}">
-                                        <img src="https://flagcdn.com/w40/{{ country }}.png" class="flag-icon" alt="{{ code }}">
-                                        <div class="currency-info">
-                                            <span class="currency-code">{{ code }}</span>
-                                            <span class="currency-name">{{ name }}</span>
-                                        </div>
+                            <button type="button" class="custom-select-btn flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 w-full justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img alt="Flag" class="w-6 h-6 rounded-full object-cover flag-display" src="https://flagcdn.com/w40/{% if to_curr_country %}{{ to_curr_country }}{% else %}eu{% endif %}.png"/>
+                                    <span class="font-bold text-lg code-display dark:text-white">{{ to_curr|default:'EUR' }}</span>
+                                </div>
+                                <span class="material-symbols-outlined text-primary">expand_more</span>
+                            </button>
+                            <!-- Searchable Dropdown Menu -->
+                            <div class="dropdown-menu absolute left-0 mt-3 w-full bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 z-[100] overflow-hidden scale-95 opacity-0 pointer-events-none transition-all duration-200">
+                                <div class="p-4 border-b border-slate-100 dark:border-slate-800">
+                                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg px-3 py-2">
+                                        <span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+                                        <input type="text" placeholder="Filter..." class="bg-transparent border-none p-0 text-sm w-full focus:ring-0 dropdown-search dark:text-white"/>
                                     </div>
-                                {% endfor %}
+                                </div>
+                                <div class="max-h-60 overflow-y-auto custom-scrollbar dropdown-list">
+                                    {% for code, name, country in currencies %}
+                                        <button type="button" class="dropdown-item w-full flex items-center gap-4 p-4 hover:bg-primary/5 transition-all text-left group" data-value="{{ code }}" data-country="{{ country }}" data-name="{{ name }}">
+                                            <img alt="{{ code }}" class="w-7 h-7 rounded-full object-cover shadow-sm" src="https://flagcdn.com/w40/{{ country }}.png" loading="lazy"/>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-sm dark:text-white">{{ code }}</span>
+                                                <span class="text-[10px] text-slate-500 font-medium truncate w-32">{{ name }}</span>
+                                            </div>
+                                        </button>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="form-group time-period-selector">
-                        <label for="days">Time Period</label>
-                        <select name="days" id="days">
-                            <option value="7" {% if days == 7 %}selected{% endif %}>Last 7 Days</option>
-                            <option value="14" {% if days == 14 %}selected{% endif %}>Last 14 Days</option>
-                            <option value="30" {% if days == 30 %}selected{% endif %}>Last 30 Days</option>
+                    <!-- Time Period -->
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-500">Analysis Duration</label>
+                        <select name="days" id="days" class="w-full bg-white dark:bg-slate-800 px-4 py-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 font-bold dark:text-white focus:ring-primary focus:border-primary">
+                            <option value="7" {% if days == 7 %}selected{% endif %}>Historical 7D</option>
+                            <option value="14" {% if days == 14 %}selected{% endif %}>Historical 14D</option>
+                            <option value="30" {% if days == 30 %}selected{% endif %}>Historical 30D</option>
                         </select>
                     </div>
-                </div>
 
-                <button type="submit" class="convert-btn">Update Analysis</button>
-            </form>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary-dark text-white font-black py-4 rounded-xl transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-2">
+                         <span class="material-symbols-outlined">restart_alt</span>
+                         <span>Update Analysis</span>
+                    </button>
+                </form>
+            </div>
 
-            <div class="chart-container">
-                <canvas id="trendChart"></canvas>
+            <!-- Info Card -->
+            <div class="bg-slate-900 rounded-3xl p-8 relative overflow-hidden group">
+                <div class="absolute -right-5 -bottom-5 w-24 h-24 bg-white/5 rounded-full blur-2xl group-hover:bg-white/10 transition-colors"></div>
+                <h4 class="text-white font-headline font-bold mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">info</span>
+                    Trend Insight
+                </h4>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    Analyzing the <b>{{ from_curr }}/{{ to_curr }}</b> pair over the last <b>{{ days }} days</b> helps identify seasonal patterns and market volatility.
+                </p>
             </div>
         </div>
-        <footer>
-            &copy; 2026 Currency Converter. Data provided by ExchangeRate-API & Fawaz Ahmed API.
-        </footer>
-    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const ctx = document.getElementById('trendChart').getContext('2d');
-            const labels = JSON.parse('{{ labels_json|escapejs }}');
-            const dataValues = JSON.parse('{{ historical_rates_json|escapejs }}');
-            
-            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-            const primaryColor = '#6366f1';
-            const textColor = isDark ? '#94a3b8' : '#475569';
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+        <!-- Main Chart Card -->
+        <div class="xl:col-span-8 glass-card rounded-3xl p-8 lg:p-10 shadow-glass ring-1 ring-white/10">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="font-headline font-black text-slate-900 dark:text-white text-3xl tracking-tight">Market Visualization</h2>
+                    <p class="text-slate-500 font-bold uppercase tracking-[0.2em] text-[10px] mt-1">{{ from_curr }} to {{ to_curr }} Performance</p>
+                </div>
+                <div class="hidden sm:flex flex-col items-end">
+                    <span class="text-primary font-mono font-bold text-xl">{{ dataValues|last|floatformat:4 }}</span>
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest">Current Mid-Market</span>
+                </div>
+            </div>
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: `1 {{ from_curr }} to {{ to_curr }}`,
-                        data: dataValues,
-                        borderColor: primaryColor,
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        borderWidth: 4,
-                        tension: 0.4,
-                        fill: true,
-                        pointBackgroundColor: primaryColor,
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 4,
-                        pointHoverRadius: 7,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
-                            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.98)' : 'rgba(255, 255, 255, 0.98)',
-                            titleColor: isDark ? '#f8fafc' : '#0f172a',
-                            bodyColor: isDark ? '#94a3b8' : '#475569',
-                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(99, 102, 241, 0.1)',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 12,
-                            bodyFont: {
-                                family: "'Inter', sans-serif",
-                                size: 13,
-                                weight: '500'
-                            },
-                            titleFont: {
-                                family: "'Inter', sans-serif",
-                                size: 12,
-                                weight: '700'
-                            }
-                        }
+            <div class="h-[400px] w-full relative">
+                <canvas id="mainTrendChart"></canvas>
+            </div>
+
+            <div class="mt-10 pt-8 border-t border-slate-200 dark:border-white/5 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+                <div class="space-y-1">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block">Period High</span>
+                    <span class="font-mono font-bold text-slate-900 dark:text-white" id="period-high">Calculated...</span>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block">Period Low</span>
+                    <span class="font-mono font-bold text-slate-900 dark:text-white" id="period-low">Calculated...</span>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block">Average</span>
+                    <span class="font-mono font-bold text-slate-900 dark:text-white" id="period-avg">Calculated...</span>
+                </div>
+                <div class="space-y-1">
+                    <span class="text-[10px] text-slate-500 font-black uppercase tracking-widest block">Volatility</span>
+                    <span class="font-mono font-bold text-secondary">Low</span>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<nav class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-lg z-50 flex justify-around items-center px-6 py-4 glass-card rounded-[2.5rem] shadow-glass shadow-primary/20 ring-1 ring-white/20">
+    <a class="relative flex flex-col items-center justify-center p-3 group transition-all" href="{% url 'index' %}">
+        <div class="absolute -inset-2 bg-transparent rounded-2xl scale-50 opacity-0 group-hover:bg-slate-100 dark:group-hover:bg-slate-800 group-hover:scale-100 group-hover:opacity-100 transition-all"></div>
+        <span class="material-symbols-outlined text-slate-400 group-hover:text-primary transition-colors">currency_exchange</span>
+        <span class="font-headline text-[10px] font-bold uppercase tracking-[0.2em] mt-1 text-slate-400 group-hover:text-primary transition-colors">Converter</span>
+    </a>
+    <a class="relative flex flex-col items-center justify-center p-3 group transition-all" href="{% url 'currency_trend' %}">
+        <div class="absolute -inset-2 bg-primary/10 rounded-2xl scale-110 opacity-100 group-hover:bg-primary/20 transition-all"></div>
+        <span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform" style="font-variation-settings: 'FILL' 1;">show_chart</span>
+        <span class="font-headline text-[10px] font-black uppercase tracking-[0.2em] mt-1 text-primary">Trends</span>
+    </a>
+</nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const labels = JSON.parse('{{ labels_json|escapejs }}');
+        const dataValues = JSON.parse('{{ historical_rates_json|escapejs }}');
+        const ctx = document.getElementById('mainTrendChart').getContext('2d');
+        
+        const isDark = document.documentElement.classList.contains('dark');
+        const primaryColor = '#4f46e5';
+        const accentColor = '#8b5cf6';
+
+        // Stats Calculation
+        const high = Math.max(...dataValues);
+        const low = Math.min(...dataValues);
+        const avg = dataValues.reduce((a, b) => a + b, 0) / dataValues.length;
+        
+        document.getElementById('period-high').textContent = high.toFixed(4);
+        document.getElementById('period-low').textContent = low.toFixed(4);
+        document.getElementById('period-avg').textContent = avg.toFixed(4);
+
+        // Chart Init
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `1 {{ from_curr }} to {{ to_curr }}`,
+                    data: dataValues,
+                    borderColor: primaryColor,
+                    borderWidth: 4,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.3)');
+                        gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+                        return gradient;
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: false,
-                            grid: {
-                                color: gridColor,
-                                borderDash: [5, 5]
-                            },
-                            ticks: {
-                                color: textColor,
-                                font: {
-                                    family: "'JetBrains Mono', monospace",
-                                    size: 11
-                                }
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            },
-                            ticks: {
-                                color: textColor,
-                                maxRotation: 45,
-                                minRotation: 45,
-                                font: {
-                                    family: "'Inter', sans-serif",
-                                    size: 10,
-                                    weight: '600'
-                                }
-                            }
-                        }
+                    pointBackgroundColor: primaryColor,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 8,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: { duration: 2500, easing: 'easeOutQuart' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: '#1e293b',
+                        titleFont: { family: 'Inter', size: 14, weight: 'bold' },
+                        bodyFont: { family: 'JetBrains Mono', size: 16 },
+                        padding: 16,
+                        cornerRadius: 16,
+                        displayColors: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        grid: { color: 'rgba(148, 163, 184, 0.1)', borderDash: [5, 5] },
+                        ticks: { color: '#94a3b8', font: { family: 'JetBrains Mono', size: 11 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10, weight: 'bold' } }
                     }
                 }
-            });
-
-            // Make chart container responsive height
-            const chartCanvas = document.getElementById('trendChart');
-            chartCanvas.style.height = '300px';
+            }
         });
-    </script>
-    <script src="{% static 'js/main.js' %}"></script>
+    });
+</script>
+<script src="{% static 'js/main.js' %}"></script>
 </body>
 </html>
