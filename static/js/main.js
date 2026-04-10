@@ -1,175 +1,243 @@
+/**
+ * Fiscal Architect 2.0 - Core Logic
+ * Handles interactive components, theme switching, and data visualization.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Theme Switcher Logic
+    // --- Theme Controller ---
+    const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
-    const sunIcon = document.getElementById('sun-icon');
-    const moonIcon = document.getElementById('moon-icon');
-    const htmlElement = document.documentElement;
+    const themeIcon = document.getElementById('theme-icon');
 
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    setTheme(savedTheme);
+    const updateThemeUI = (isDark) => {
+        themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+    };
 
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
-    });
+    const toggleTheme = () => {
+        const isDark = html.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        updateThemeUI(isDark);
+    };
 
-    function setTheme(theme) {
-        htmlElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-        
-        if (theme === 'light') {
-            sunIcon.style.display = 'block';
-            moonIcon.style.display = 'none';
-        } else {
-            sunIcon.style.display = 'none';
-            moonIcon.style.display = 'block';
-        }
+    // Init Theme
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    if (savedTheme === 'dark') {
+        html.classList.add('dark');
+        updateThemeUI(true);
+    } else {
+        html.classList.remove('dark');
+        updateThemeUI(false);
     }
 
-    // Custom Dropdown Logic
-    const initCustomSelect = (selectId) => {
-        const select = document.getElementById(selectId);
-        if (!select) return;
-        
-        const wrapper = select.closest('.custom-select-wrapper');
-        const customSelect = wrapper.querySelector('.custom-select');
-        const optionsList = wrapper.querySelector('.select-options');
-        const options = wrapper.querySelectorAll('.select-option');
+    themeToggle?.addEventListener('click', toggleTheme);
 
-        // Update custom display based on native select
-        const updateDisplay = () => {
-            const selectedOption = select.options[select.selectedIndex];
-            if (!selectedOption) return;
-            
-            const country = selectedOption.getAttribute('data-country');
-            const code = selectedOption.value;
-            
-            const flagImg = customSelect.querySelector('.flag-icon');
-            if (flagImg) flagImg.src = `https://flagcdn.com/w40/${country}.png`;
-            
-            const codeSpan = customSelect.querySelector('.currency-code');
-            if (codeSpan) codeSpan.textContent = code;
-            
-            // Update active state in list
-            options.forEach(opt => {
-                opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
+
+    // --- Custom Searchable Dropdowns ---
+    const initSearchableSelect = (wrapperId, selectId, nameLabelId) => {
+        const wrapper = document.getElementById(wrapperId);
+        const select = document.getElementById(selectId);
+        if (!wrapper || !select) return;
+
+        const btn = wrapper.querySelector('.custom-select-btn');
+        const menu = wrapper.querySelector('.dropdown-menu');
+        const searchInput = wrapper.querySelector('.dropdown-search');
+        const items = wrapper.querySelectorAll('.dropdown-item');
+        const flagDisplay = wrapper.querySelector('.flag-display');
+        const codeDisplay = wrapper.querySelector('.code-display');
+        const nameLabel = document.getElementById(nameLabelId);
+
+        const toggleMenu = (show) => {
+            if (show) {
+                menu.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
+                menu.classList.add('scale-100', 'opacity-100');
+                searchInput?.focus();
+            } else {
+                menu.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+                menu.classList.remove('scale-100', 'opacity-100');
+                if (searchInput) searchInput.value = '';
+                filterItems('');
+            }
+        };
+
+        const filterItems = (query) => {
+            const q = query.toLowerCase();
+            items.forEach(item => {
+                const code = item.getAttribute('data-value').toLowerCase();
+                const name = item.getAttribute('data-name').toLowerCase();
+                if (code.includes(q) || name.includes(q)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
             });
         };
 
-        // Initialize state
-        updateDisplay();
+        const updateDisplay = () => {
+            const selected = select.options[select.selectedIndex];
+            if (!selected) return;
 
-        customSelect.addEventListener('click', (e) => {
+            const code = selected.value;
+            const country = selected.getAttribute('data-country');
+            const name = selected.getAttribute('data-name');
+
+            if (flagDisplay) flagDisplay.src = `https://flagcdn.com/w40/${country}.png`;
+            if (codeDisplay) codeDisplay.textContent = code;
+            if (nameLabel) nameLabel.textContent = name;
+
+            // Highlight in list
+            items.forEach(item => {
+                const isActive = item.getAttribute('data-value') === code;
+                item.classList.toggle('bg-primary/10', isActive);
+                item.classList.toggle('border-primary', isActive);
+            });
+        };
+
+        // Event Listeners
+        btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            closeAllDropdowns(optionsList);
-            optionsList.classList.toggle('show');
-            customSelect.classList.toggle('active');
+            const isShowing = !menu.classList.contains('opacity-0');
+            // Close all first
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+                m.classList.remove('scale-100', 'opacity-100');
+            });
+            toggleMenu(!isShowing);
         });
 
-        options.forEach(option => {
-            option.addEventListener('click', () => {
-                const value = option.getAttribute('data-value');
-                select.value = value;
+        searchInput?.addEventListener('input', (e) => filterItems(e.target.value));
+
+        items.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const val = item.getAttribute('data-value');
+                select.value = val;
                 updateDisplay();
-                optionsList.classList.remove('show');
-                customSelect.classList.remove('active');
+                toggleMenu(false);
             });
         });
+
+        // Initialize display
+        updateDisplay();
 
         return { updateDisplay };
     };
 
-    const closeAllDropdowns = (except) => {
-        document.querySelectorAll('.select-options').forEach(list => {
-            if (list !== except) {
-                list.classList.remove('show');
-                list.previousElementSibling.classList.remove('active');
+    const fromControl = initSearchableSelect('from-wrapper', 'from_currency', 'from_currency_name_label');
+    const toControl = initSearchableSelect('to-wrapper', 'to_currency', 'to_currency_name_label');
+
+    // Close on outside click
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown-menu').forEach(m => {
+            m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+            m.classList.remove('scale-100', 'opacity-100');
+        });
+    });
+
+
+    // --- Swap Button Logic ---
+    const swapBtn = document.getElementById('swap-btn');
+    swapBtn?.addEventListener('click', () => {
+        const fromSelect = document.getElementById('from_currency');
+        const toSelect = document.getElementById('to_currency');
+        
+        const temp = fromSelect.value;
+        fromSelect.value = toSelect.value;
+        toSelect.value = temp;
+
+        fromControl.updateDisplay();
+        toControl.updateDisplay();
+
+        // Visual feedback for result update
+        const targetValue = document.getElementById('target-value');
+        if (targetValue) {
+            targetValue.style.opacity = '0.3';
+            setTimeout(() => targetValue.style.opacity = '1', 300);
+        }
+    });
+
+
+    // --- Quick Access ---
+    document.querySelectorAll('.quick-access-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const code = btn.getAttribute('data-code');
+            const toSelect = document.getElementById('to_currency');
+            if (toSelect) {
+                toSelect.value = code;
+                toControl.updateDisplay();
+                document.getElementById('converter-form')?.submit();
+            }
+        });
+    });
+
+
+    // --- Performance Chart ---
+    const initChart = () => {
+        const ctx = document.getElementById('miniPerformanceChart')?.getContext('2d');
+        if (!ctx) return;
+
+        // Generate semi-random data for visual appeal (simulating 24h)
+        const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+        const data = Array.from({length: 24}, () => Math.random() * 10 + 90);
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Market Rate',
+                    data: data,
+                    borderColor: '#4f46e5',
+                    borderWidth: 3,
+                    pointRadius: 0,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: (context) => {
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 200);
+                        gradient.addColorStop(0, 'rgba(79, 70, 229, 0.2)');
+                        gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
+                        return gradient;
+                    }
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                scales: {
+                    x: { display: false },
+                    y: { display: false }
+                }
             }
         });
     };
 
-    document.addEventListener('click', () => closeAllDropdowns());
+    initChart();
 
-    initCustomSelect('from_currency');
-    initCustomSelect('to_currency');
 
-    // Currency Swap Logic
-    const fromSelect = document.getElementById('from_currency');
-    const toSelect = document.getElementById('to_currency');
-    const converterForm = document.getElementById('converter-form');
+    // --- Submission Loader ---
+    const form = document.getElementById('converter-form');
+    const submitBtn = document.getElementById('main-convert-btn');
     
-    if (fromSelect && toSelect && converterForm) {
-        // Create a better swap button with modern styles
-        const swapBtn = document.createElement('button');
-        swapBtn.type = 'button';
-        swapBtn.className = 'swap-btn';
-        swapBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="3" y1="21" x2="20" y2="4"></line></svg>
-        `;
-        
-        // Position it between the two selects
-        const toGroup = toSelect.closest('.form-group');
-        toGroup.before(swapBtn);
+    form?.addEventListener('submit', () => {
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <svg class="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Processing...</span>
+                </div>
+            `;
+        }
+    });
 
-        swapBtn.addEventListener('click', () => {
-            const temp = fromSelect.value;
-            fromSelect.value = toSelect.value;
-            toSelect.value = temp;
-            
-            // Sync custom displays by triggering updateDisplay logic
-            // We can just call the init logic again or store the functions
-            // But since we want to be clean, let's just trigger a change event if we had listeners
-            // Or just manually call the update logic. Let's make the update logic accessible.
-            
-            const updateAll = () => {
-                const selects = ['from_currency', 'to_currency'];
-                selects.forEach(id => {
-                    const selectEl = document.getElementById(id);
-                    const wrapper = selectEl.closest('.custom-select-wrapper');
-                    const customSelect = wrapper.querySelector('.custom-select');
-                    const options = wrapper.querySelectorAll('.select-option');
-                    const selectedOption = selectEl.options[selectEl.selectedIndex];
-                    
-                    if (selectedOption) {
-                        const country = selectedOption.getAttribute('data-country');
-                        const code = selectedOption.value;
-                        customSelect.querySelector('.flag-icon').src = `https://flagcdn.com/w40/${country}.png`;
-                        customSelect.querySelector('.currency-code').textContent = code;
-                        options.forEach(opt => {
-                            opt.classList.toggle('selected', opt.getAttribute('data-value') === code);
-                        });
-                    }
-                });
-            };
-
-            updateAll();
-            
-            // Add rotation animation
-            swapBtn.classList.add('rotating');
-            setTimeout(() => {
-                swapBtn.classList.remove('rotating');
-            }, 400);
-        });
-    }
-
-    // Form submission state
-    const convertBtn = document.querySelector('.convert-btn');
-    if (converterForm && convertBtn) {
-        converterForm.addEventListener('submit', () => {
-            convertBtn.innerHTML = '<span class="loading">Processing...</span>';
-            convertBtn.style.opacity = '0.7';
-            convertBtn.style.pointerEvents = 'none';
-        });
-    }
-
-    // Interactive button effects
-    if (convertBtn) {
-        convertBtn.addEventListener('mousedown', () => {
-            convertBtn.style.transform = 'scale(0.98)';
-        });
-        convertBtn.addEventListener('mouseup', () => {
-            convertBtn.style.transform = 'translateY(-2px)';
-        });
-    }
+    // Enter key support
+    form?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            form.submit();
+        }
+    });
 });
