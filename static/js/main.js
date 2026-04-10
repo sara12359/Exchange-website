@@ -1,20 +1,24 @@
 /**
  * Fiscal Architect 2.0 - Core Logic
- * Handles interactive components, theme switching, and data visualization.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Core logic initializing...');
+
     // --- Theme Controller ---
     const html = document.documentElement;
     const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
 
     const updateThemeUI = (isDark) => {
-        themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+        if (themeIcon) {
+            themeIcon.innerText = isDark ? 'light_mode' : 'dark_mode';
+        }
     };
 
     const toggleTheme = () => {
         const isDark = html.classList.toggle('dark');
+        html.setAttribute('data-theme', isDark ? 'dark' : 'light');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         updateThemeUI(isDark);
         console.log('Theme toggled. Dark mode:', isDark);
@@ -22,13 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Init Theme
     const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    if (savedTheme === 'dark') {
+    const isInitialDark = savedTheme === 'dark';
+    if (isInitialDark) {
         html.classList.add('dark');
-        updateThemeUI(true);
+        html.setAttribute('data-theme', 'dark');
     } else {
         html.classList.remove('dark');
-        updateThemeUI(false);
+        html.setAttribute('data-theme', 'light');
     }
+    updateThemeUI(isInitialDark);
 
     themeToggle?.addEventListener('click', toggleTheme);
 
@@ -37,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initSearchableSelect = (wrapperId, selectId, nameLabelId) => {
         const wrapper = document.getElementById(wrapperId);
         const select = document.getElementById(selectId);
-        if (!wrapper || !select) return;
+        if (!wrapper || !select) return null;
 
         const btn = wrapper.querySelector('.custom-select-btn');
         const menu = wrapper.querySelector('.dropdown-menu');
@@ -49,66 +55,74 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const toggleMenu = (show) => {
             if (show) {
+                // Close all other menus first
+                document.querySelectorAll('.dropdown-menu').forEach(m => {
+                    if (m !== menu) {
+                        m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+                        m.classList.remove('scale-100', 'opacity-100');
+                    }
+                });
                 menu.classList.remove('pointer-events-none', 'opacity-0', 'scale-95');
                 menu.classList.add('scale-100', 'opacity-100');
-                searchInput?.focus();
+                if (searchInput) {
+                    searchInput.value = '';
+                    filterItems('');
+                    setTimeout(() => searchInput.focus(), 10);
+                }
             } else {
                 menu.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
                 menu.classList.remove('scale-100', 'opacity-100');
-                if (searchInput) searchInput.value = '';
-                filterItems('');
             }
         };
 
         const filterItems = (query) => {
-            const q = query.toLowerCase();
+            const q = query.toLowerCase().trim();
             items.forEach(item => {
                 const code = item.getAttribute('data-value').toLowerCase();
                 const name = item.getAttribute('data-name').toLowerCase();
                 const matches = code.includes(q) || name.includes(q);
-                item.classList.toggle('hidden', !matches);
-                // Also ensure it's not 'flex' if hidden
-                if (!matches) {
-                    item.classList.remove('flex');
-                } else {
+                
+                if (matches) {
+                    item.classList.remove('hidden');
                     item.classList.add('flex');
+                } else {
+                    item.classList.add('hidden');
+                    item.classList.remove('flex');
                 }
             });
         };
 
         const updateDisplay = () => {
-            const selected = select.options[select.selectedIndex];
-            if (!selected) return;
+            const idx = select.selectedIndex;
+            if (idx === -1) return;
+            const selected = select.options[idx];
 
             const code = selected.value;
             const country = selected.getAttribute('data-country');
             const name = selected.getAttribute('data-name');
 
-            if (flagDisplay) flagDisplay.src = `https://flagcdn.com/w40/${country}.png`;
-            if (codeDisplay) codeDisplay.textContent = code;
-            if (nameLabel) nameLabel.textContent = name;
+            if (flagDisplay && country) flagDisplay.src = `https://flagcdn.com/w40/${country}.png`;
+            if (codeDisplay) codeDisplay.innerText = code;
+            if (nameLabel) nameLabel.innerText = name;
 
-            // Highlight in list
+            // Highlight selected in list
             items.forEach(item => {
                 const isActive = item.getAttribute('data-value') === code;
                 item.classList.toggle('bg-primary/10', isActive);
                 item.classList.toggle('border-primary', isActive);
+                item.classList.toggle('border-l-4', isActive);
             });
         };
 
-        // Event Listeners
-        btn.addEventListener('click', (e) => {
+        // Listeners
+        btn?.addEventListener('click', (e) => {
             e.stopPropagation();
             const isShowing = !menu.classList.contains('opacity-0');
-            // Close all first
-            document.querySelectorAll('.dropdown-menu').forEach(m => {
-                m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
-                m.classList.remove('scale-100', 'opacity-100');
-            });
             toggleMenu(!isShowing);
         });
 
         searchInput?.addEventListener('input', (e) => filterItems(e.target.value));
+        searchInput?.addEventListener('click', (e) => e.stopPropagation());
 
         items.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -117,10 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 select.value = val;
                 updateDisplay();
                 toggleMenu(false);
+                
+                // Trigger change event if needed
+                const event = new Event('change', { bubbles: true });
+                select.dispatchEvent(event);
             });
         });
 
-        // Initialize display
+        // Init display
         updateDisplay();
 
         return { updateDisplay };
@@ -130,85 +148,90 @@ document.addEventListener('DOMContentLoaded', () => {
     const toControl = initSearchableSelect('to-wrapper', 'to_currency', 'to_currency_name_label');
 
     // Close on outside click
-    document.addEventListener('click', () => {
-        document.querySelectorAll('.dropdown-menu').forEach(m => {
-            m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
-            m.classList.remove('scale-100', 'opacity-100');
-        });
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.custom-select-wrapper')) {
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                m.classList.add('pointer-events-none', 'opacity-0', 'scale-95');
+                m.classList.remove('scale-100', 'opacity-100');
+            });
+        }
     });
 
 
     // --- Swap Button Logic ---
     const swapBtn = document.getElementById('swap-btn');
     swapBtn?.addEventListener('click', (e) => {
+        console.log('Swap button clicked');
         e.preventDefault();
         e.stopPropagation();
         
         const fromSelect = document.getElementById('from_currency');
         const toSelect = document.getElementById('to_currency');
         
-        if (!fromSelect || !toSelect) return;
+        if (!fromSelect || !toSelect) {
+            console.error('Select elements not found for swap');
+            return;
+        }
 
-        const tempVal = fromSelect.value;
-        fromSelect.value = toSelect.value;
-        toSelect.value = tempVal;
+        const currentFrom = fromSelect.value;
+        const currentTo = toSelect.value;
+        
+        fromSelect.value = currentTo;
+        toSelect.value = currentFrom;
 
-        // Trigger updates
         if (fromControl) fromControl.updateDisplay();
         if (toControl) toControl.updateDisplay();
 
-        console.log('Currencies swapped:', fromSelect.value, 'to', toSelect.value);
-
-        // Visual feedback for result update
-        const targetValue = document.getElementById('target-value');
-        if (targetValue) {
-            targetValue.classList.add('opacity-30', 'scale-95');
-            setTimeout(() => targetValue.classList.remove('opacity-30', 'scale-95'), 200);
-        }
+        // Animation
+        const targets = [document.getElementById('target-value'), document.querySelector('input[name="amount"]')];
+        targets.forEach(t => {
+            if (t) {
+                t.classList.add('opacity-30', 'scale-95');
+                setTimeout(() => t.classList.remove('opacity-30', 'scale-95'), 150);
+            }
+        });
     });
 
 
-    // --- Quick Access ---
+    // --- Quick Access Buttons ---
     document.querySelectorAll('.quick-access-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
             const code = btn.getAttribute('data-code');
             const toSelect = document.getElementById('to_currency');
             if (toSelect) {
                 toSelect.value = code;
                 toControl.updateDisplay();
+                // Optionally submit or just update
                 document.getElementById('converter-form')?.submit();
             }
         });
     });
 
 
-    // --- Performance Chart ---
-    const initChart = () => {
+    // --- Mini Chart Initialization (Homepage Only) ---
+    const initMiniChart = () => {
         const canvas = document.getElementById('miniPerformanceChart');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Clean up old chart if exists
         if (window.myMiniChart) window.myMiniChart.destroy();
 
-        const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
-        const data = Array.from({length: 24}, () => Math.random() * 5 + 95);
-
+        const dataPoints = Array.from({length: 24}, () => Math.random() * 4 + 96);
         window.myMiniChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: Array.from({length: 24}, (_, i) => i),
                 datasets: [{
-                    label: 'Market Rate',
-                    data: data,
+                    data: dataPoints,
                     borderColor: '#4f46e5',
                     borderWidth: 3,
                     pointRadius: 0,
                     tension: 0.4,
                     fill: true,
                     backgroundColor: (context) => {
-                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 150);
+                        const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 120);
                         gradient.addColorStop(0, 'rgba(79, 70, 229, 0.4)');
                         gradient.addColorStop(1, 'rgba(79, 70, 229, 0)');
                         return gradient;
@@ -218,44 +241,34 @@ document.addEventListener('DOMContentLoaded', () => {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: { duration: 2000, easing: 'easeOutQuart' },
+                animation: { duration: 1500, easing: 'easeOutQuart' },
                 plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                scales: {
-                    x: { display: false },
-                    y: { display: false, min: 90, max: 105 }
-                }
+                scales: { x: { display: false }, y: { display: false, min: 90, max: 110 } }
             }
         });
-        console.log('Homepage chart initialized');
+        console.log('Mini performance chart initialized');
     };
 
-    initChart();
+    initMiniChart();
 
 
-    // --- Submission Loader ---
+    // --- Form Feedback Loader ---
     const form = document.getElementById('converter-form');
     const submitBtn = document.getElementById('main-convert-btn');
     
     form?.addEventListener('submit', () => {
         if (submitBtn) {
             submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
             submitBtn.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <svg class="animate-spin h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <div class="flex items-center gap-2">
+                    <svg class="animate-spin h-5 w-5 text-current" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                     <span>Processing...</span>
                 </div>
             `;
-        }
-    });
-
-    // Enter key support
-    form?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            form.submit();
         }
     });
 });
