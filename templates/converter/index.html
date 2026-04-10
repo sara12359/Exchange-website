@@ -118,7 +118,9 @@
 </div>
 </div>
 </header>
-<main class="max-w-5xl mx-auto px-6 pt-10 space-y-12">
+<main class="max-w-6xl mx-auto px-4 md:px-6 pt-24 space-y-12 mb-20">
+    <!-- Hero Section -->
+    <section class="text-center space-y-4 pt-10">
 
 {% if error %}
     <div class="bg-error-container text-on-error-container p-4 rounded-xl flex items-center gap-3">
@@ -406,6 +408,6 @@
 </a>
 </nav>
 
-<script src="{% static 'js/main.js' %}"></script>
+<script src="{% static 'js/main.js' %}?v={% now 'U' %}"></script>
 </body>
 </html>
