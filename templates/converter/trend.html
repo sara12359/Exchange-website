@@ -19,12 +19,12 @@
               "primary-dark": "#3730a3",
               "secondary": "#10b981",
               "accent": "#8b5cf6",
-              "background": "#0f172a",
-              "surface": "#1e293b",
-              "surface-light": "#334155",
-              "on-surface": "#f8fafc",
-              "on-surface-variant": "#94a3b8",
-              "outline": "#475569"
+              "background": "var(--background)",
+              "surface": "var(--surface)",
+              "surface-light": "var(--surface-light)",
+              "on-surface": "var(--on-surface)",
+              "on-surface-variant": "var(--on-surface-variant)",
+              "outline": "var(--outline)"
             },
             fontFamily: {
               "headline": ["Manrope", "sans-serif"],
@@ -42,10 +42,22 @@
 </script>
 <style>
       :root {
-        --glass-bg: rgba(255, 255, 255, 0.05);
-        --glass-border: rgba(255, 255, 255, 0.1);
+        --background: #f8fafc;
+        --surface: #ffffff;
+        --surface-light: #f1f5f9;
+        --on-surface: #020617;
+        --on-surface-variant: #64748b;
+        --outline: #e2e8f0;
+        --glass-bg: rgba(255, 255, 255, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.5);
       }
       .dark {
+        --background: #0f172a;
+        --surface: #1e293b;
+        --surface-light: #334155;
+        --on-surface: #f8fafc;
+        --on-surface-variant: #94a3b8;
+        --outline: #475569;
         --glass-bg: rgba(15, 23, 42, 0.4);
         --glass-border: rgba(255, 255, 255, 0.05);
       }
@@ -60,14 +72,16 @@
       }
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #f8fafc;
+        background-color: var(--background);
+        background-image: 
+          radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.05) 0px, transparent 50%);
+        background-attachment: fixed;
       }
       .dark body {
-        background-color: #0f172a;
         background-image: 
           radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 50%),
           radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.1) 0px, transparent 50%);
-        background-attachment: fixed;
       }
       .custom-scrollbar::-webkit-scrollbar {
         width: 6px;
