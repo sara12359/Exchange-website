@@ -17,7 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const toggleTheme = () => {
-        const isDark = html.classList.toggle('dark');
+        const isDark = !html.classList.contains('dark');
+        if (isDark) {
+            html.classList.add('dark');
+            html.classList.remove('light');
+        } else {
+            html.classList.remove('dark');
+            html.classList.add('light');
+        }
         html.setAttribute('data-theme', isDark ? 'dark' : 'light');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
         updateThemeUI(isDark);
