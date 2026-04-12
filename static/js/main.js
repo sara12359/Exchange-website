@@ -36,9 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const isInitialDark = savedTheme === 'dark';
     if (isInitialDark) {
         html.classList.add('dark');
+        html.classList.remove('light');
         html.setAttribute('data-theme', 'dark');
     } else {
         html.classList.remove('dark');
+        html.classList.add('light');
         html.setAttribute('data-theme', 'light');
     }
     updateThemeUI(isInitialDark);
